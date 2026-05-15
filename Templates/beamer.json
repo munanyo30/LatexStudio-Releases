@@ -1,0 +1,5 @@
+{
+  "name": "Apresentação (Beamer)",
+  "description": "Template para apresentações em slides.",
+  "body": "\\documentclass{beamer}\n\\usetheme{Madrid}\n{{packages}}\n\\begin{document}\n\\begin{frame}\n\\titlepage\n\\end{frame}\n{{body}}\n\\end{document}\n"
+}

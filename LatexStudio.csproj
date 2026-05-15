@@ -7,6 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>LatexStudio</AssemblyName>
     <RootNamespace>LatexStudio</RootNamespace>
+    <ApplicationIcon>latexStudio.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +16,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="latexStudio.ico" />
     <None Include="Templates\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="LatexStudio.Core\**" />
+    <Compile Remove="LatexStudio.LicenseGenerator\**" />
+    <EmbeddedResource Remove="LatexStudio.Core\**" />
+    <EmbeddedResource Remove="LatexStudio.LicenseGenerator\**" />
+    <None Remove="LatexStudio.Core\**" />
+    <None Remove="LatexStudio.LicenseGenerator\**" />
+    <Page Remove="LatexStudio.Core\**" />
+    <Page Remove="LatexStudio.LicenseGenerator\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="LatexStudio.Core\LatexStudio.Core.csproj" />
   </ItemGroup>
 </Project>

@@ -5,6 +5,7 @@
         xmlns:vm="clr-namespace:LatexStudio.ViewModels"
         xmlns:conv="clr-namespace:LatexStudio.Converters"
         Title="Latex Studio"
+        Icon="pack://application:,,,/latexStudio.ico"
         Width="1420"
         Height="900"
         MinWidth="1040"
@@ -47,14 +48,14 @@
                     
                     <Border Style="{StaticResource PanelBorder}" Background="{DynamicResource PanelAltBrush}" Padding="12" Margin="0,0,0,16">
                         <WrapPanel>
-                            <Button Content="+ Linha" Command="{Binding DataContext.AddRowCommand, RelativeSource={RelativeSource AncestorType=Window}}" ToolTip="Insere uma linha abaixo da selecionada." />
-                            <Button Content="- Linha" Command="{Binding DataContext.RemoveRowCommand, RelativeSource={RelativeSource AncestorType=Window}}" ToolTip="Remove a linha da célula selecionada." />
+                            <Button Content="+ Linha" Command="{Binding DataContext.AddRowCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+                            <Button Content="- Linha" Command="{Binding DataContext.RemoveRowCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
                             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="8,0,14,0" Height="24" />
-                            <Button Content="+ Coluna" Command="{Binding DataContext.AddColumnCommand, RelativeSource={RelativeSource AncestorType=Window}}" ToolTip="Insere uma coluna à direita da selecionada." />
-                            <Button Content="- Coluna" Command="{Binding DataContext.RemoveColumnCommand, RelativeSource={RelativeSource AncestorType=Window}}" ToolTip="Remove a coluna da célula selecionada." />
+                            <Button Content="+ Coluna" Command="{Binding DataContext.AddColumnCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+                            <Button Content="- Coluna" Command="{Binding DataContext.RemoveColumnCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
                             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="8,0,14,0" Height="24" />
-                            <Button Content="Merge →" Command="{Binding DataContext.MergeCellCommand, RelativeSource={RelativeSource AncestorType=Window}}" Background="{DynamicResource AccentBrush}" Foreground="White" BorderThickness="0" />
-                            <Button Content="Merge ↓" Command="{Binding DataContext.MergeCellDownCommand, RelativeSource={RelativeSource AncestorType=Window}}" Background="{DynamicResource AccentBrush}" Foreground="White" BorderThickness="0" />
+                            <Button Content="Merge →" Command="{Binding DataContext.MergeCellCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource AccentButton}" />
+                            <Button Content="Merge ↓" Command="{Binding DataContext.MergeCellDownCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource AccentButton}" />
                             <Button Content="Split" Command="{Binding DataContext.SplitCellCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
                         </WrapPanel>
                     </Border>
@@ -188,10 +189,10 @@
 
                     <Border Style="{StaticResource PanelBorder}" Background="{DynamicResource PanelAltBrush}" Padding="16" Margin="0,0,0,20">
                         <DockPanel>
-                            <Button DockPanel.Dock="Left" Content="+ Adicionar Imagem" Command="{Binding DataContext.AddImageFileCommand, RelativeSource={RelativeSource AncestorType=Window}}" Background="{DynamicResource AccentBrush}" Foreground="White" BorderThickness="0" />
+                            <Button DockPanel.Dock="Left" Content="+ Adicionar Imagem" Command="{Binding DataContext.AddImagePlaceholderCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource AccentButton}" Margin="0" />
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <TextBlock Text="Modo de Layout:" VerticalAlignment="Center" Margin="0,0,12,0" />
-                                <ComboBox ItemsSource="{Binding DataContext.ImageLayouts, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding LayoutMode}" Width="160" />
+                                <TextBlock Text="Modo de Layout:" VerticalAlignment="Center" Margin="0,0,12,0" FontWeight="SemiBold" />
+                                <ComboBox ItemsSource="{Binding DataContext.ImageLayouts, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding LayoutMode}" Width="160" Margin="0" />
                             </StackPanel>
                         </DockPanel>
                     </Border>
@@ -225,6 +226,10 @@
                                                     <TextBlock Text="Legenda da Imagem" Style="{StaticResource MutedLabel}" />
                                                     <TextBox Text="{Binding Caption, UpdateSourceTrigger=PropertyChanged}" Margin="0" />
                                                 </StackPanel>
+                                                <Button Grid.Column="1" Content="✕" 
+                                                        Command="{Binding DataContext.RemoveImageCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                        CommandParameter="{Binding}"
+                                                        VerticalAlignment="Bottom" Margin="8,0,0,0" Width="34" Height="34" />
                                                 <StackPanel Grid.Column="1" Margin="12,0,0,0" Width="80">
                                                     <StackPanel.Style>
                                                         <Style TargetType="StackPanel">
@@ -261,10 +266,10 @@
 
                     <Border Style="{StaticResource PanelBorder}" Background="{DynamicResource PanelAltBrush}" Padding="16" Margin="0,0,0,20">
                         <DockPanel>
-                            <Button DockPanel.Dock="Left" Content="+ Novo Item" Command="{Binding DataContext.AddListItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" Background="{DynamicResource AccentBrush}" Foreground="White" BorderThickness="0" />
+                            <Button DockPanel.Dock="Left" Content="+ Novo Item" Command="{Binding DataContext.AddListItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource AccentButton}" Margin="0" />
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <TextBlock Text="Estilo da Lista:" VerticalAlignment="Center" Margin="0,0,12,0" />
-                                <ComboBox ItemsSource="{Binding DataContext.ListKinds, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding ListKind}" Width="140" />
+                                <TextBlock Text="Estilo da Lista:" VerticalAlignment="Center" Margin="0,0,12,0" FontWeight="SemiBold" />
+                                <ComboBox ItemsSource="{Binding DataContext.ListKinds, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding ListKind}" Width="140" Margin="0" />
                             </StackPanel>
                         </DockPanel>
                     </Border>
@@ -315,12 +320,12 @@
                     <Border Style="{StaticResource PanelBorder}" Background="{DynamicResource PanelAltBrush}" Padding="16" Margin="0,0,0,24">
                         <DockPanel>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Tipo de Gráfico:" VerticalAlignment="Center" Margin="0,0,12,0" />
-                                <ComboBox ItemsSource="{Binding DataContext.ChartKinds, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding ChartKind}" Width="160" />
+                                <TextBlock Text="Tipo de Gráfico:" VerticalAlignment="Center" Margin="0,0,12,0" FontWeight="SemiBold" />
+                                <ComboBox ItemsSource="{Binding DataContext.ChartKinds, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding ChartKind}" Width="160" Margin="0" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <CheckBox Content="Grelha" IsChecked="{Binding ShowGrid}" VerticalAlignment="Center" Margin="0,0,16,0" />
-                                <CheckBox Content="Legenda" IsChecked="{Binding ShowLegend}" VerticalAlignment="Center" />
+                                <CheckBox Content="Legenda" IsChecked="{Binding ShowLegend}" VerticalAlignment="Center" Margin="0" />
                             </StackPanel>
                         </DockPanel>
                     </Border>
@@ -373,6 +378,227 @@
                 </StackPanel>
             </ScrollViewer>
         </DataTemplate>
+
+        <!-- Text Element Template -->
+        <DataTemplate DataType="{x:Type models:TextElement}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+                <StackPanel MaxWidth="800" HorizontalAlignment="Left">
+                    <TextBlock Text="Editor de Texto" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" />
+
+                    <Grid Margin="0,0,0,24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                            <TextBlock Text="Título / Nome" Style="{StaticResource MutedLabel}" />
+                            <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" FontSize="14" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                            <TextBlock Text="Nível de Secção" Style="{StaticResource MutedLabel}" />
+                            <ComboBox ItemsSource="{Binding DataContext.SectionLevels, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding Level}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Style="{StaticResource PanelBorder}" Background="{DynamicResource PanelAltBrush}" Padding="12" Margin="0,0,0,20">
+                        <StackPanel Orientation="Horizontal">
+                            <ToggleButton Content="B" IsChecked="{Binding IsBold}" FontWeight="Bold" Width="40" Margin="0,0,4,0" />
+                            <ToggleButton Content="I" IsChecked="{Binding IsItalic}" FontStyle="Italic" Width="40" Margin="0,0,12,0" />
+                            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="0,0,12,0" Height="24" />
+                            <TextBlock Text="Alinhamento:" VerticalAlignment="Center" Margin="0,0,8,0" />
+                            <ComboBox ItemsSource="{Binding DataContext.TextAlignments, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding Alignment}" Width="120" />
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="Conteúdo" Style="{StaticResource MutedLabel}" />
+                    <TextBox Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}" 
+                             AcceptsReturn="True" 
+                             TextWrapping="Wrap" 
+                             MinHeight="200" 
+                             FontSize="14" 
+                             Padding="12"
+                             VerticalContentAlignment="Top" />
+                </StackPanel>
+            </ScrollViewer>
+        </DataTemplate>
+
+        <!-- Equation Element Template -->
+        <DataTemplate DataType="{x:Type models:EquationElement}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+                <StackPanel MaxWidth="800" HorizontalAlignment="Left">
+                    <TextBlock Text="Editor de Equações" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" />
+
+                    <Grid Margin="0,0,0,24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                            <TextBlock Text="Título da Equação" Style="{StaticResource MutedLabel}" />
+                            <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" FontSize="14" />
+                        </StackPanel>
+                        <CheckBox Grid.Column="1" Content="Numerada" IsChecked="{Binding IsNumbered}" VerticalAlignment="Bottom" Margin="0,0,0,8" />
+                    </Grid>
+
+                    <TextBlock Text="Fórmula (LaTeX)" Style="{StaticResource MutedLabel}" />
+                    <TextBox Text="{Binding Formula, UpdateSourceTrigger=PropertyChanged}" 
+                             FontFamily="Cascadia Mono, Consolas"
+                             FontSize="16"
+                             Padding="16"
+                             Margin="0,0,0,20"
+                             TextAlignment="Center" />
+
+                    <TextBlock Text="Preview Rápido:" Style="{StaticResource MutedLabel}" Margin="0,0,0,8" />
+                    <Border Background="#F1F5F9" CornerRadius="8" Padding="24">
+                        <TextBlock Text="{Binding Formula}" 
+                                   FontSize="24" 
+                                   HorizontalAlignment="Center" 
+                                   FontStyle="Italic"
+                                   Foreground="{DynamicResource AccentBrush}" />
+                    </Border>
+                    <TextBlock Text="Nota: Use comandos LaTeX padrão. O preview acima é apenas textual." 
+                               Style="{StaticResource MutedLabel}" 
+                               FontSize="10" 
+                               HorizontalAlignment="Center" 
+                               Margin="0,8,0,0" />
+                </StackPanel>
+            </ScrollViewer>
+        </DataTemplate>
+
+        <!-- Bibliography Element Template -->
+        <DataTemplate DataType="{x:Type models:BibliographyElement}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+                <StackPanel MaxWidth="800" HorizontalAlignment="Left">
+                    <TextBlock Text="Gestão de Bibliografia" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" />
+
+                    <Grid Margin="0,0,0,24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="200" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                            <TextBlock Text="Título do Bloco" Style="{StaticResource MutedLabel}" />
+                            <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" FontSize="14" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Estilo (bibstyle)" Style="{StaticResource MutedLabel}" />
+                            <TextBox Text="{Binding Style, UpdateSourceTrigger=PropertyChanged}" FontSize="14" />
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="Conteúdo do ficheiro .bib" Style="{StaticResource MutedLabel}" />
+                    <TextBox Text="{Binding BibContent, UpdateSourceTrigger=PropertyChanged}" 
+                             FontFamily="Cascadia Mono, Consolas"
+                             AcceptsReturn="True" 
+                             MinHeight="300" 
+                             FontSize="12" 
+                             Padding="12"
+                             VerticalContentAlignment="Top" />
+                    
+                    <TextBlock Text="Dica: Use \cite{chave} no seu texto para referenciar estas entradas." 
+                               Style="{StaticResource MutedLabel}" 
+                               Margin="0,12,0,0" 
+                               FontStyle="Italic" />
+                </StackPanel>
+            </ScrollViewer>
+        </DataTemplate>
+        <!-- Code Element Template -->
+        <DataTemplate DataType="{x:Type models:CodeElement}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+                <StackPanel MaxWidth="800" HorizontalAlignment="Left">
+                    <TextBlock Text="Editor de Código" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" />
+
+                    <Grid Margin="0,0,0,24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                            <TextBlock Text="Título do Bloco" Style="{StaticResource MutedLabel}" />
+                            <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" FontSize="14" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                            <TextBlock Text="Linguagem (ex: Python, C++)" Style="{StaticResource MutedLabel}" />
+                            <TextBox Text="{Binding Language, UpdateSourceTrigger=PropertyChanged}" FontSize="14" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Style="{StaticResource PanelBorder}" Background="{DynamicResource PanelAltBrush}" Padding="12" Margin="0,0,0,20">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Content="Números de Linha" IsChecked="{Binding ShowLineNumbers}" Margin="0,0,20,0" />
+                            <CheckBox Content="Quebra de Linha" IsChecked="{Binding BreakLines}" />
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="Código Fonte" Style="{StaticResource MutedLabel}" />
+                    <TextBox Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}" 
+                             FontFamily="Cascadia Mono, Consolas"
+                             AcceptsReturn="True" 
+                             AcceptsTab="True"
+                             MinHeight="300" 
+                             FontSize="13" 
+                             Padding="12"
+                             VerticalContentAlignment="Top" />
+                </StackPanel>
+            </ScrollViewer>
+        </DataTemplate>
+
+        <!-- Theorem Element Template -->
+        <DataTemplate DataType="{x:Type models:TheoremElement}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+                <StackPanel MaxWidth="800" HorizontalAlignment="Left">
+                    <TextBlock Text="Ambiente Académico (Teorema/Definição)" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" />
+
+                    <Grid Margin="0,0,0,24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                            <TextBlock Text="Tipo" Style="{StaticResource MutedLabel}" />
+                            <ComboBox ItemsSource="{Binding DataContext.TheoremKinds, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding TheoremKind}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                            <TextBlock Text="Subtítulo / Nome (opcional)" Style="{StaticResource MutedLabel}" />
+                            <TextBox Text="{Binding Subtitle, UpdateSourceTrigger=PropertyChanged}" FontSize="14" />
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="Enunciado / Conteúdo" Style="{StaticResource MutedLabel}" />
+                    <TextBox Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}" 
+                             AcceptsReturn="True" 
+                             TextWrapping="Wrap"
+                             MinHeight="150" 
+                             FontSize="14" 
+                             Padding="12"
+                             VerticalContentAlignment="Top" />
+                </StackPanel>
+            </ScrollViewer>
+        </DataTemplate>
+
+        <!-- Custom Code Element Template -->
+        <DataTemplate DataType="{x:Type models:CustomCodeElement}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+                <StackPanel MaxWidth="800" HorizontalAlignment="Left">
+                    <TextBlock Text="Código LaTeX Manual (Snippet)" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" />
+                    <TextBlock Text="Use este bloco para inserir comandos que não existem na app ou formatação manual complexa." 
+                               Style="{StaticResource MutedLabel}" FontStyle="Italic" Margin="0,0,0,16" />
+
+                    <TextBlock Text="Nome do Snippet" Style="{StaticResource MutedLabel}" />
+                    <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,20" />
+
+                    <TextBlock Text="Código RAW" Style="{StaticResource MutedLabel}" />
+                    <TextBox Text="{Binding RawLatex, UpdateSourceTrigger=PropertyChanged}" 
+                             FontFamily="Cascadia Mono, Consolas"
+                             AcceptsReturn="True" 
+                             AcceptsTab="True"
+                             MinHeight="400" 
+                             FontSize="13" 
+                             Padding="12"
+                             VerticalContentAlignment="Top" />
+                </StackPanel>
+            </ScrollViewer>
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>
@@ -390,25 +616,25 @@
                     <TextBlock Text="Studio" FontSize="20" FontWeight="Bold" Margin="2,0,24,0" />
                 </StackPanel>
 
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                        <Button Content="Undo" Command="{Binding UndoCommand}" Width="70" />
-                        <Button Content="Redo" Command="{Binding RedoCommand}" Width="70" />
+                        <Button Content="Undo" Command="{Binding UndoCommand}" Width="80" />
+                        <Button Content="Redo" Command="{Binding RedoCommand}" Width="80" />
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
                         <Button Content="Abrir" Command="{Binding OpenProjectCommand}" />
-                        <Button Content="Guardar" Command="{Binding SaveProjectCommand}" Background="{DynamicResource AccentBrush}" Foreground="White" BorderThickness="0" />
+                        <Button Content="Guardar" Command="{Binding SaveProjectCommand}" Style="{StaticResource AccentButton}" />
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                        <Button Content="Overleaf" Command="{Binding ExportToOverleafCommand}" Style="{StaticResource AccentButton}" />
                         <Button Content="Copiar" Command="{Binding CopyLatexCommand}" />
                         <Button Content=".tex" Command="{Binding ExportTexCommand}" />
-                        <Button Content="PDF" Command="{Binding ExportPdfCommand}" />
                     </StackPanel>
                     
                     <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="0,0,20,0" Height="24" />
-                    <CheckBox Content="Dark" IsChecked="{Binding IsDarkTheme}" Checked="OnThemeChanged" Unchecked="OnThemeChanged" VerticalAlignment="Center" />
+                    <CheckBox Content="Dark Mode" IsChecked="{Binding IsDarkTheme}" Checked="OnThemeChanged" Unchecked="OnThemeChanged" VerticalAlignment="Center" FontWeight="SemiBold" />
                 </StackPanel>
 
                 <!-- Tabs -->
@@ -463,85 +689,181 @@
 
             <!-- Sidebar -->
             <Border Grid.Column="0" Background="{DynamicResource PanelAltBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" Padding="16">
-                <DockPanel>
-                    <TextBlock DockPanel.Dock="Top" Text="ELEMENTOS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" Margin="4,0,0,12" />
-                    
-                    <Grid DockPanel.Dock="Top" Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Button Grid.Row="0" Grid.Column="0" Content="+ Tabela" Command="{Binding AddTableCommand}" Margin="0,0,4,8" />
-                        <Button Grid.Row="0" Grid.Column="1" Content="+ Imagem" Command="{Binding AddImageCommand}" Margin="4,0,0,8" />
-                        <Button Grid.Row="1" Grid.Column="0" Content="+ Lista" Command="{Binding AddListCommand}" Margin="0,0,4,0" />
-                        <Button Grid.Row="1" Grid.Column="1" Content="+ Gráfico" Command="{Binding AddChartCommand}" Margin="4,0,0,0" />
-                    </Grid>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Text="PROJETO" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" Margin="4,0,0,8" />
+                        
+                        <!-- Metadata Expander -->
+                        <Expander DockPanel.Dock="Top" Header="Metadados Académicos" IsExpanded="False" Margin="0,0,0,16">
+                            <StackPanel Margin="10,10,0,0">
+                                <TextBlock Text="Título do Documento" Style="{StaticResource MutedLabel}" />
+                                <TextBox Text="{Binding Document.Name, UpdateSourceTrigger=PropertyChanged}" />
+                                
+                                <TextBlock Text="Autor" Style="{StaticResource MutedLabel}" />
+                                <TextBox Text="{Binding Document.Author, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <Button DockPanel.Dock="Bottom" Content="Remover Selecionado" Command="{Binding RemoveSelectedCommand}" Margin="0,12,0,0" />
-                    
-                    <ListBox ItemsSource="{Binding Document.Elements}" SelectedItem="{Binding SelectedElement}" BorderThickness="0" Background="Transparent">
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <Setter Property="Padding" Value="10,8" />
-                                <Setter Property="Margin" Value="0,2" />
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="ListBoxItem">
-                                            <Border x:Name="border" CornerRadius="6" Background="Transparent" Padding="{TemplateBinding Padding}">
-                                                <ContentPresenter />
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsSelected" Value="True">
-                                                    <Setter TargetName="border" Property="Background" Value="{DynamicResource AccentBrush}" />
-                                                    <Setter Property="Foreground" Value="White" />
-                                                </Trigger>
-                                                <MultiTrigger>
-                                                    <MultiTrigger.Conditions>
-                                                        <Condition Property="IsMouseOver" Value="True" />
-                                                        <Condition Property="IsSelected" Value="False" />
-                                                    </MultiTrigger.Conditions>
-                                                    <Setter TargetName="border" Property="Background" Value="{DynamicResource BorderBrush}" />
-                                                </MultiTrigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </ListBox.ItemContainerStyle>
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <ContentControl Content="{Binding Kind}" Margin="0,0,10,0">
-                                        <ContentControl.Resources>
-                                            <DataTemplate DataType="{x:Type models:DocumentElementKind}">
-                                                <TextBlock x:Name="Icon" Text="📄" />
-                                                <DataTemplate.Triggers>
-                                                    <DataTrigger Binding="{Binding}" Value="Table">
-                                                        <Setter TargetName="Icon" Property="Text" Value="📋" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding}" Value="Image">
-                                                        <Setter TargetName="Icon" Property="Text" Value="🖼️" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding}" Value="List">
-                                                        <Setter TargetName="Icon" Property="Text" Value="📝" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding}" Value="Chart">
-                                                        <Setter TargetName="Icon" Property="Text" Value="📊" />
-                                                    </DataTrigger>
-                                                </DataTemplate.Triggers>
-                                            </DataTemplate>
-                                        </ContentControl.Resources>
-                                    </ContentControl>
-                                    <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </DockPanel>
+                                <TextBlock Text="Instituição" Style="{StaticResource MutedLabel}" />
+                                <TextBox Text="{Binding Document.Institution, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <TextBlock Text="Orientador" Style="{StaticResource MutedLabel}" />
+                                <TextBox Text="{Binding Document.Advisor, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <TextBlock Text="Co-orientador" Style="{StaticResource MutedLabel}" />
+                                <TextBox Text="{Binding Document.CoAdvisor, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <TextBlock Text="Palavras-chave" Style="{StaticResource MutedLabel}" />
+                                <TextBox Text="{Binding Document.Keywords, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <TextBlock Text="Resumo (Abstract)" Style="{StaticResource MutedLabel}" />
+                                <TextBox Text="{Binding Document.AbstractText, UpdateSourceTrigger=PropertyChanged}" 
+                                         AcceptsReturn="True" MinHeight="80" VerticalContentAlignment="Top" />
+
+                                <TextBlock Text="Índices e Listas" Style="{StaticResource MutedLabel}" Margin="0,8,0,4" />
+                                <CheckBox Content="Índice Geral (ToC)" IsChecked="{Binding Document.IncludeTableOfContents}" />
+                                <CheckBox Content="Lista de Figuras (LoF)" IsChecked="{Binding Document.IncludeListOfFigures}" />
+                                <CheckBox Content="Lista de Tabelas (LoT)" IsChecked="{Binding Document.IncludeListOfTables}" />
+                            </StackPanel>
+                        </Expander>
+
+                        <TextBlock DockPanel.Dock="Top" Text="CONFIGURAÇÃO" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" Margin="4,0,0,8" />
+                        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,20">
+                            <TextBlock Text="Template de Documento" Style="{StaticResource MutedLabel}" />
+                            <ComboBox ItemsSource="{Binding Templates}" SelectedItem="{Binding SelectedTemplate}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <TextBlock Text="Licença" Style="{StaticResource MutedLabel}" Margin="0,8,0,4" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding LicenseInfo}" VerticalAlignment="Center" FontSize="11" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+                                <Button Grid.Column="1" Content="Validar" Command="{Binding VerifyLicenseCommand}" Height="28" Padding="10,2" Margin="8,0,0,0" FontSize="11" />
+                            </Grid>
+                        </StackPanel>
+
+                        <TextBlock DockPanel.Dock="Top" Text="ELEMENTOS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" Margin="4,0,0,12" />
+                        
+                        <Grid DockPanel.Dock="Top" Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Button Grid.Row="0" Grid.Column="0" Content="+ Tabela" Command="{Binding AddTableCommand}" />
+                            <Button Grid.Row="0" Grid.Column="1" Content="+ Imagem" Command="{Binding AddImageCommand}" />
+                            <Button Grid.Row="1" Grid.Column="0" Content="+ Lista" Command="{Binding AddListCommand}" />
+                            <Button Grid.Row="1" Grid.Column="1" Content="+ Gráfico" Command="{Binding AddChartCommand}" />
+                            <Button Grid.Row="2" Grid.Column="0" Content="+ Texto" Command="{Binding AddTextCommand}" Style="{StaticResource AccentButton}" />
+                            <Button Grid.Row="2" Grid.Column="1" Content="+ Equação" Command="{Binding AddEquationCommand}" Style="{StaticResource AccentButton}" />
+                            <Button Grid.Row="3" Grid.Column="0" Content="+ Código" Command="{Binding AddCodeCommand}" Style="{StaticResource AccentButton}" />
+                            <Button Grid.Row="3" Grid.Column="1" Content="+ Teorema" Command="{Binding AddTheoremCommand}" Style="{StaticResource AccentButton}" />
+                            <Button Grid.Row="4" Grid.Column="0" Content="+ Bib" Command="{Binding AddBibliographyCommand}" Margin="0,4,4,0" />
+                            <Button Grid.Row="4" Grid.Column="1" Content="+ Manual" Command="{Binding AddCustomCodeCommand}" Margin="4,4,0,0" />
+                        </Grid>
+
+                        <Button DockPanel.Dock="Bottom" Content="Remover Selecionado" Command="{Binding RemoveSelectedCommand}" Margin="0,12,0,0" />
+
+                        <Grid DockPanel.Dock="Bottom" Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" Content="↑ Subir" Command="{Binding MoveUpCommand}" Margin="0,0,4,0" />
+                            <Button Grid.Column="1" Content="↓ Descer" Command="{Binding MoveDownCommand}" Margin="4,0,0,0" />
+                        </Grid>
+
+                        <ListBox ItemsSource="{Binding Document.Elements}" SelectedItem="{Binding SelectedElement}" BorderThickness="0" Background="Transparent" MinHeight="200">
+
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="10,8" />
+                                    <Setter Property="Margin" Value="0,2" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border x:Name="border" CornerRadius="6" Background="Transparent" Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter />
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter TargetName="border" Property="Background" Value="{DynamicResource AccentBrush}" />
+                                                        <Setter Property="Foreground" Value="White" />
+                                                    </Trigger>
+                                                    <MultiTrigger>
+                                                        <MultiTrigger.Conditions>
+                                                            <Condition Property="IsMouseOver" Value="True" />
+                                                            <Condition Property="IsSelected" Value="False" />
+                                                        </MultiTrigger.Conditions>
+                                                        <Setter TargetName="border" Property="Background" Value="{DynamicResource BorderBrush}" />
+                                                    </MultiTrigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <ContentControl Content="{Binding Kind}" Margin="0,0,10,0">
+                                            <ContentControl.Resources>
+                                                <DataTemplate DataType="{x:Type models:DocumentElementKind}">
+                                                    <TextBlock x:Name="Icon" Text="📄" />
+                                                    <DataTemplate.Triggers>
+                                                        <DataTrigger Binding="{Binding}" Value="Table">
+                                                            <Setter TargetName="Icon" Property="Text" Value="📋" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding}" Value="Image">
+                                                            <Setter TargetName="Icon" Property="Text" Value="🖼️" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding}" Value="List">
+                                                            <Setter TargetName="Icon" Property="Text" Value="📝" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding}" Value="Chart">
+                                                            <Setter TargetName="Icon" Property="Text" Value="📊" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding}" Value="Text">
+                                                            <Setter TargetName="Icon" Property="Text" Value="📄" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding}" Value="Equation">
+                                                            <Setter TargetName="Icon" Property="Text" Value="∑" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding}" Value="Bibliography">
+                                                            <Setter TargetName="Icon" Property="Text" Value="📚" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding}" Value="Code">
+                                                            <Setter TargetName="Icon" Property="Text" Value="💻" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding}" Value="Theorem">
+                                                            <Setter TargetName="Icon" Property="Text" Value="⚖️" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding}" Value="CustomCode">
+                                                            <Setter TargetName="Icon" Property="Text" Value="🛠️" />
+                                                        </DataTrigger>
+                                                        </DataTemplate.Triggers>
+
+                                                </DataTemplate>
+                                            </ContentControl.Resources>
+                                        </ContentControl>
+                                        <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
+                </ScrollViewer>
             </Border>
 
             <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Background="Transparent" Cursor="SizeWE" />
@@ -560,7 +882,7 @@
                 <Border Style="{StaticResource PaperBorder}" Margin="20" Padding="30">
                     <DockPanel>
                         <StackPanel DockPanel.Dock="Top" Margin="0,0,0,16">
-                            <TextBlock Text="PREVIEW LATEX" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" />
+                            <TextBlock Text="CÓDIGO LATEX" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" />
                             <Separator Background="{DynamicResource BorderBrush}" Margin="0,8,0,0" />
                         </StackPanel>
                         
@@ -582,7 +904,7 @@
 
         <!-- Status Bar -->
         <Border Grid.Row="2" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
-            <TextBlock Text="{Binding Status}" Foreground="{DynamicResource MutedTextBrush}" Margin="20,0" VerticalAlignment="Center" FontSize="11" />
+            <TextBlock x:Name="StatusTextBlock" Text="{Binding Status}" Foreground="{DynamicResource MutedTextBrush}" Margin="20,0" VerticalAlignment="Center" FontSize="11" />
         </Border>
     </Grid>
 </Window>

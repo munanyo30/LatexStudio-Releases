@@ -28,11 +28,21 @@ public sealed class PdfBuildService
         var error = await process.StandardError.ReadToEndAsync(cancellationToken);
         await process.WaitForExitAsync(cancellationToken);
 
+        // Debug log for troubleshooting
+        var logPath = Path.Combine(Path.GetDirectoryName(texPath) ?? "", "latex_build.log");
+        File.WriteAllText(logPath, "STDOUT:\n" + output + "\n\nSTDERR:\n" + error);
+
         if (process.ExitCode != 0)
         {
-            throw new InvalidOperationException(output + Environment.NewLine + error);
+            throw new InvalidOperationException($"Erro na compilação ({process.ExitCode}). Consulte '{logPath}' para detalhes.");
         }
 
-        return Path.ChangeExtension(texPath, ".pdf");
+        var pdfPath = Path.ChangeExtension(texPath, ".pdf");
+        if (!File.Exists(pdfPath))
+        {
+            throw new FileNotFoundException("O processo terminou com sucesso mas o ficheiro PDF não foi gerado.");
+        }
+
+        return pdfPath;
     }
 }

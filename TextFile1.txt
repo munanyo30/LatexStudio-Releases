@@ -1,0 +1,119 @@
+﻿Editor visual de equações matemáticas → gerar LaTeX automaticamente.
+Autocomplete de comandos LaTeX.
+Preview PDF em tempo real.
+Syntax highlight do código LaTeX.
+Export direto para Overleaf.
+Importar .tex existente e converter para UI visual.
+Templates:
+artigo científico
+tese
+relatório
+IEEE
+APA
+beamer/slides
+Sistema drag-and-drop para reorganizar elementos.
+Árvore de elementos/documento na sidebar.
+Sistema de secções/subsecções automático.
+Geração automática de índice.
+Bibliografia integrada (BibTeX).
+Gestor de referências/citações.
+Inserção rápida de:
+teoremas
+definições
+código
+notas
+caixas coloridas
+Editor de código com syntax highlighting.
+Suporte a:
+Python
+C#
+C++
+Java
+JSON
+Exportar snippets para listings/minted.
+Tema personalizável da UI.
+Sistema de plugins.
+Atalhos de teclado estilo VSCode.
+Histórico/versionamento de projetos.
+Backup automático.
+Multi-document tabs.
+Pesquisa global.
+Replace global.
+Compressão automática de imagens.
+Crop/rotação de imagens.
+SVG support.
+Editor vetorial básico.
+Alinhamento inteligente/grid snapping.
+Sistema de estilos reutilizáveis.
+Presets de tabelas/gráficos.
+Duplicar elementos.
+Copy/paste entre projetos.
+Exportar gráficos para PNG/SVG/PDF.
+Editor avançado de cores.
+Paletas de cores.
+Suporte a transparência.
+Sistema de layers.
+Agrupar elementos.
+Zoom infinito no canvas.
+Canvas visual tipo Figma.
+Responsividade automática de tabelas.
+Conversão CSV/Excel → tabela LaTeX.
+Importar dados JSON/CSV.
+Ligação live entre tabela e gráfico.
+Atualização automática dos gráficos.
+Editor de eixos matemáticos.
+Gráficos 3D.
+Heatmaps.
+Diagramas UML.
+Fluxogramas.
+Árvores/binárias/grafos.
+TikZ visual editor.
+Geração automática de TikZ.
+Sistema de snippets favoritos.
+Biblioteca de componentes reutilizáveis.
+Export para Markdown + LaTeX.
+Export para HTML/PDF/Word.
+OCR de imagens → tabela/editável.
+Screenshot → converter para tabela LaTeX.
+IA integrada:
+corrigir LaTeX
+otimizar código
+gerar tabelas
+gerar gráficos
+converter texto para fórmula
+Chat AI dentro da app.
+Sistema de macros/custom commands.
+Multi-language UI.
+Collaborative editing online.
+Login/cloud sync.
+Marketplace de templates.
+Monitor de erros LaTeX em tempo real.
+Clique no erro → navegar para elemento visual.
+Performance otimizada para documentos grandes.
+Sistema de cache.
+Render incremental.
+Mini mapa do documento.
+Fullscreen focus mode.
+Export batch.
+API pública/plugin SDK.
+Sistema de permissões para equipas.
+Geração automática de relatórios completos.
+Assistente wizard:
+“Criar relatório/tese/artigo”.
+Conversor Word → LaTeX visual.
+Conversor PowerPoint → Beamer.
+Gerador automático de capas académicas.
+Editor de headers/footers.
+Numeração automática de páginas/equações.
+Sistema de notas de rodapé visual.
+Hyperlinks internos automáticos.
+Geração automática de anexos/apêndices.
+Spell checker.
+Grammar checker.
+Sistema de comentários/anotações.
+Export ultra clean sem packages desnecessários.
+Portable mode sem instalação.
+Dark mode automático conforme SO.
+GPU accelerated rendering.
+Multi-monitor support.
+Auto-update system.
