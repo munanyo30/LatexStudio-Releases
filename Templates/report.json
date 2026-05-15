@@ -1,0 +1,5 @@
+{
+  "name": "Relatório Técnico",
+  "description": "Template para relatórios técnicos com estrutura de capítulos.",
+  "body": "\\documentclass[12pt,a4paper]{report}\n{{packages}}\n\\usepackage[a4paper,margin=2.5cm]{geometry}\n\\usepackage{caption}\n\\usepackage{hyperref}\n\\begin{document}\n{{body}}\n\\end{document}\n"
+}

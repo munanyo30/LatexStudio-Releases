@@ -13,7 +13,7 @@ public sealed class LatexGenerator
         this.templateService = templateService ?? new TemplateService();
     }
 
-    public LatexGenerationResult Generate(AcademicDocument document)
+    public LatexGenerationResult Generate(AcademicDocument document, LatexTemplate? template = null)
     {
         var registry = new ReferenceRegistry();
         var packages = new SortedSet<string>(StringComparer.Ordinal)
@@ -25,26 +25,95 @@ public sealed class LatexGenerator
         };
 
         var body = new StringBuilder();
+
+        // Metadata
+        if (!string.IsNullOrWhiteSpace(document.Name)) body.AppendLine($"\\title{{{Escape(document.Name)}}}");
+        
+        var authorLine = new StringBuilder();
+        authorLine.Append(Escape(document.Author));
+        if (!string.IsNullOrWhiteSpace(document.Institution)) authorLine.Append($"\\\\ \\small {Escape(document.Institution)}");
+        body.AppendLine($"\\author{{{authorLine}}}");
+
+        if (!string.IsNullOrWhiteSpace(document.Advisor))
+        {
+            var advisors = new List<string> { $"Orientador: {Escape(document.Advisor)}" };
+            if (!string.IsNullOrWhiteSpace(document.CoAdvisor)) advisors.Add($"Co-orientador: {Escape(document.CoAdvisor)}");
+            body.AppendLine($"\\date{{\\vspace{{1em}} {string.Join(" \\\\ ", advisors)}}}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(document.Name) || !string.IsNullOrWhiteSpace(document.Author)) body.AppendLine("\\maketitle\n");
+
+        if (!string.IsNullOrWhiteSpace(document.AbstractText))
+        {
+            body.AppendLine("\\begin{abstract}");
+            body.AppendLine(document.AbstractText);
+            body.AppendLine("\\end{abstract}\n");
+        }
+
+        if (!string.IsNullOrWhiteSpace(document.Keywords))
+        {
+            body.AppendLine($"\\noindent \\textbf{{Palavras-chave:}} {Escape(document.Keywords)}\n");
+            body.AppendLine("\\vspace{2em}");
+        }
+
+        // Indexes
+        if (document.IncludeTableOfContents) body.AppendLine("\\tableofcontents\n\\newpage");
+        if (document.IncludeListOfFigures) body.AppendLine("\\listoffigures\n\\newpage");
+        if (document.IncludeListOfTables) body.AppendLine("\\listoftables\n\\newpage");
+
+        var bibElements = document.Elements.OfType<BibliographyElement>().ToList();
+        
+        if (bibElements.Any())
+        {
+            packages.Add("\\usepackage{filecontents}");
+            foreach (var bib in bibElements)
+            {
+                body.AppendLine("\\begin{filecontents*}{references.bib}");
+                body.AppendLine(bib.BibContent);
+                body.AppendLine("\\end{filecontents*}");
+            }
+        }
+
+        template ??= templateService.LoadTemplates().First();
+        bool isBeamer = template.Body.Contains("\\documentclass{beamer}");
+
         foreach (var element in document.Elements.Where(e => e.IncludeInExport))
         {
             var reference = registry.Assign(element);
-            body.AppendLine(element switch
+            var elementCode = element switch
             {
                 TableElement table => GenerateTable(table, reference, packages),
                 ImageElement image => GenerateImage(image, reference, packages),
                 ListElement list => GenerateList(list, packages),
                 ChartElement chart => GenerateChart(chart, reference, packages),
+                TextElement text => GenerateText(text, reference, packages),
+                EquationElement equation => GenerateEquation(equation, reference, packages),
+                CodeElement codeElement => GenerateCode(codeElement, packages),
+                TheoremElement theorem => GenerateTheorem(theorem, reference, packages),
+                CustomCodeElement custom => custom.RawLatex,
+                BibliographyElement bib => GenerateBibliography(bib),
                 _ => ""
-            });
+            };
+
+            if (isBeamer && element is not BibliographyElement)
+            {
+                body.AppendLine("\\begin{frame}");
+                if (!string.IsNullOrWhiteSpace(element.Title)) body.AppendLine($"\\frametitle{{{Escape(element.Title)}}}");
+                body.AppendLine(elementCode);
+                body.AppendLine("\\end{frame}\n");
+            }
+            else
+            {
+                body.AppendLine(elementCode);
+            }
         }
 
-        var template = templateService.LoadTemplates().First();
         var packageBlock = string.Join(Environment.NewLine, packages);
-        var code = template.Body
+        var finalCode = template.Body
             .Replace("{{packages}}", packageBlock, StringComparison.Ordinal)
             .Replace("{{body}}", body.ToString().Trim(), StringComparison.Ordinal);
 
-        return new LatexGenerationResult(code.Trim() + Environment.NewLine, packages);
+        return new LatexGenerationResult(finalCode.Trim() + Environment.NewLine, packages);
     }
 
     private static string GenerateTable(TableElement table, ReferenceInfo reference, ISet<string> packages)
@@ -289,6 +358,128 @@ public sealed class LatexGenerator
         builder.AppendLine($"\\caption{{{Escape(CaptionOrTitle(chart, reference.DisplayName))}}}");
         builder.AppendLine($"\\label{{{reference.Label}}}");
         builder.AppendLine("\\end{figure}");
+        return builder.ToString();
+    }
+
+    private static string GenerateText(TextElement text, ReferenceInfo reference, ISet<string> packages)
+    {
+        var builder = new StringBuilder();
+        var cmd = text.Level switch
+        {
+            SectionLevel.Chapter => "\\chapter",
+            SectionLevel.Section => "\\section",
+            SectionLevel.Subsection => "\\subsection",
+            SectionLevel.Subsubsection => "\\subsubsection",
+            SectionLevel.Paragraph => null, // Just text
+            _ => null
+        };
+
+        if (cmd != null)
+        {
+            builder.AppendLine($"{cmd}{{{text.Title}}}");
+            if (!string.IsNullOrWhiteSpace(reference.Label))
+                builder.AppendLine($"\\label{{{reference.Label}}}");
+        }
+
+        var content = text.Content;
+        if (text.IsBold) content = $"\\textbf{{{content}}}";
+        if (text.IsItalic) content = $"\\textit{{{content}}}";
+
+        if (text.Alignment != TextAlignment.Justify)
+        {
+            var env = text.Alignment switch
+            {
+                TextAlignment.Center => "center",
+                TextAlignment.Left => "flushleft",
+                TextAlignment.Right => "flushright",
+                _ => "center"
+            };
+            builder.AppendLine($"\\begin{{{env}}}");
+            builder.AppendLine(content);
+            builder.AppendLine($"\\end{{{env}}}");
+        }
+        else
+        {
+            builder.AppendLine(content);
+        }
+
+        return builder.ToString();
+    }
+
+    private static string GenerateEquation(EquationElement equation, ReferenceInfo reference, ISet<string> packages)
+    {
+        packages.Add("\\usepackage{amsmath}");
+        var builder = new StringBuilder();
+        var env = equation.IsNumbered ? "equation" : "equation*";
+        
+        builder.AppendLine($"\\begin{{{env}}}");
+        builder.AppendLine(equation.Formula);
+        if (equation.IsNumbered && !string.IsNullOrWhiteSpace(reference.Label))
+            builder.AppendLine($"\\label{{{reference.Label}}}");
+        builder.AppendLine($"\\end{{{env}}}");
+
+        return builder.ToString();
+    }
+
+    private static string GenerateBibliography(BibliographyElement bib)
+    {
+        var builder = new StringBuilder();
+        var style = string.IsNullOrWhiteSpace(bib.Style) ? "plain" : bib.Style;
+        builder.AppendLine($"\\bibliographystyle{{{style}}}");
+        builder.AppendLine("\\bibliography{references}");
+        return builder.ToString();
+    }
+
+    private static string GenerateCode(CodeElement code, ISet<string> packages)
+    {
+        packages.Add("\\usepackage{listings}");
+        packages.Add("\\usepackage{xcolor}");
+        
+        var builder = new StringBuilder();
+        builder.AppendLine("\\lstset{");
+        builder.AppendLine($"  language={code.Language},");
+        builder.AppendLine($"  basicstyle=\\ttfamily\\small,");
+        builder.AppendLine($"  numbers={(code.ShowLineNumbers ? "left" : "none")},");
+        builder.AppendLine($"  breaklines={(code.BreakLines ? "true" : "false")},");
+        builder.AppendLine("  keywordstyle=\\color{blue},");
+        builder.AppendLine("  commentstyle=\\color{gray},");
+        builder.AppendLine("  stringstyle=\\color{orange},");
+        builder.AppendLine("  frame=single,");
+        builder.AppendLine("  showstringspaces=false");
+        builder.AppendLine("}");
+        
+        builder.AppendLine("\\begin{lstlisting}");
+        builder.AppendLine(code.Code);
+        builder.AppendLine("\\end{lstlisting}");
+        
+        return builder.ToString();
+    }
+
+    private static string GenerateTheorem(TheoremElement theorem, ReferenceInfo reference, ISet<string> packages)
+    {
+        packages.Add("\\usepackage{amsthm}");
+        
+        // Define theorem environments if not already defined (basic set)
+        packages.Add("\\newtheorem{theorem}{Teorema}[section]");
+        packages.Add("\\newtheorem{lemma}[theorem]{Lema}");
+        packages.Add("\\newtheorem{corollary}[theorem]{Corolário}");
+        packages.Add("\\newtheorem{proposition}[theorem]{Proposição}");
+        packages.Add("\\theoremstyle{definition}");
+        packages.Add("\\newtheorem{definition}{Definição}[section]");
+        packages.Add("\\newtheorem{example}{Exemplo}[section]");
+        packages.Add("\\theoremstyle{remark}");
+        packages.Add("\\newtheorem*{remark}{Nota}");
+
+        var type = theorem.TheoremKind.ToString().ToLowerInvariant();
+        var builder = new StringBuilder();
+        
+        var title = string.IsNullOrWhiteSpace(theorem.Subtitle) ? "" : $"[{theorem.Subtitle}]";
+        builder.AppendLine($"\\begin{{{type}}}{title}");
+        builder.AppendLine(theorem.Content);
+        if (!string.IsNullOrWhiteSpace(reference.Label))
+            builder.AppendLine($"\\label{{{reference.Label}}}");
+        builder.AppendLine($"\\end{{{type}}}");
+        
         return builder.ToString();
     }
 

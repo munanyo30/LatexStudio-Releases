@@ -1,6 +1,9 @@
 namespace LatexStudio.Models;
 
-public enum DocumentElementKind { Table, Image, List, Chart }
+public enum DocumentElementKind { Table, Image, List, Chart, Text, Equation, Bibliography, Code, Theorem, CustomCode }
+public enum TheoremKind { Theorem, Lemma, Corollary, Proposition, Definition, Example, Remark, Proof }
+public enum TextAlignment { Left, Center, Right, Justify }
+public enum SectionLevel { Paragraph, Section, Subsection, Subsubsection, Chapter }
 public enum HorizontalCellAlignment { Left, Center, Right }
 public enum VerticalCellAlignment { Top, Middle, Bottom }
 public enum BorderStyleKind { None, Solid, Dashed }

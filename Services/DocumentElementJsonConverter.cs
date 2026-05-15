@@ -21,6 +21,12 @@ public sealed class DocumentElementJsonConverter : JsonConverter<DocumentElement
             DocumentElementKind.Image => JsonSerializer.Deserialize<ImageElement>(json, options),
             DocumentElementKind.List => JsonSerializer.Deserialize<ListElement>(json, options),
             DocumentElementKind.Chart => JsonSerializer.Deserialize<ChartElement>(json, options),
+            DocumentElementKind.Text => JsonSerializer.Deserialize<TextElement>(json, options),
+            DocumentElementKind.Equation => JsonSerializer.Deserialize<EquationElement>(json, options),
+            DocumentElementKind.Bibliography => JsonSerializer.Deserialize<BibliographyElement>(json, options),
+            DocumentElementKind.Code => JsonSerializer.Deserialize<CodeElement>(json, options),
+            DocumentElementKind.Theorem => JsonSerializer.Deserialize<TheoremElement>(json, options),
+            DocumentElementKind.CustomCode => JsonSerializer.Deserialize<CustomCodeElement>(json, options),
             _ => null
         };
     }

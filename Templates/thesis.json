@@ -1,0 +1,5 @@
+{
+  "name": "Tese / Dissertação",
+  "description": "Template estruturado para teses academicas (book class).",
+  "body": "\\documentclass[12pt,a4paper,oneside]{book}\n{{packages}}\n\\usepackage[a4paper,margin=3cm]{geometry}\n\\usepackage{caption}\n\\usepackage{hyperref}\n\\begin{document}\n\\frontmatter\n{{body}}\n\\end{document}\n"
+}
