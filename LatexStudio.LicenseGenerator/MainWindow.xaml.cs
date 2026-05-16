@@ -21,7 +21,7 @@ public partial class MainWindow : Window
     {
         if (string.IsNullOrWhiteSpace(DeviceIdInput.Text))
         {
-            MessageBox.Show("Por favor, insira o Device ID.");
+            MessageBox.Show("Por favor, introduza o Device ID do cliente.", "Dados em Falta", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -44,14 +44,14 @@ public partial class MainWindow : Window
         var json = generatedLicense.ToJson();
         generatedLicense.Signature = CryptoService.Sign(json, PrivateKey);
         
-        MessageBox.Show("Dados da licença gerados com sucesso! Clique em 'SALVAR' para criar o ficheiro.", "Sucesso");
+        MessageBox.Show("Dados da licença gerados com sucesso! Clique em 'GUARDAR' para criar o ficheiro .lic.", "Licença Gerada", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     private void OnSaveLicenseFile(object sender, RoutedEventArgs e)
     {
         if (generatedLicense == null)
         {
-            MessageBox.Show("Gere a licença primeiro.");
+            MessageBox.Show("Por favor, gere a licença antes de tentar guardar o ficheiro.", "Ação Necessária", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
@@ -67,7 +67,7 @@ public partial class MainWindow : Window
             var base64 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(finalJson));
             File.WriteAllText(sfd.FileName, base64);
             LicenseOutput.Text = sfd.FileName;
-            MessageBox.Show("Ficheiro .lic guardado!");
+            MessageBox.Show("O ficheiro de licença (.lic) foi guardado com sucesso.", "Ficheiro Guardado", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 

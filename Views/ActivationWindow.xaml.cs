@@ -18,7 +18,7 @@ public partial class ActivationWindow : Window
     private void OnCopyId(object sender, RoutedEventArgs e)
     {
         Clipboard.SetText(DeviceIdText.Text);
-        MessageBox.Show("ID copiado!");
+        MessageBox.Show("O ID do dispositivo foi copiado para a área de transferência.", "ID Copiado", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     private void OnLoadLicenseFile(object sender, RoutedEventArgs e)
@@ -40,7 +40,7 @@ public partial class ActivationWindow : Window
         var licenseKey = LicenseInput.Text.Trim();
         if (string.IsNullOrEmpty(licenseKey)) 
         {
-            MessageBox.Show("Por favor, insira a chave ou carregue o ficheiro .lic");
+            MessageBox.Show("Por favor, introduza a chave de ativação ou carregue um ficheiro de licença válido (.lic).", "Dados em Falta", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -50,13 +50,13 @@ public partial class ActivationWindow : Window
             try
             {
                 File.WriteAllText(licenseFilePath, licenseKey);
-                MessageBox.Show(result.Message, "Sucesso");
+                MessageBox.Show(result.Message, "Ativação Bem-sucedida", MessageBoxButton.OK, MessageBoxImage.Information);
                 DialogResult = true;
                 Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao guardar o ficheiro de licença: " + ex.Message, "Erro de Sistema", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Não foi possível guardar o ficheiro de licença: " + ex.Message, "Erro de Sistema", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         else

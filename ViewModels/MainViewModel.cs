@@ -26,7 +26,7 @@ public partial class MainViewModel : ObservableObject
         "LatexStudio",
         "autosave.latexstudio.json");
 
-    [ObservableProperty] private AcademicDocument document = AcademicDocument.CreateSample();
+    [ObservableProperty] private AcademicDocument document = new AcademicDocument();
     [ObservableProperty] private DocumentElement? selectedElement;
     [ObservableProperty] private string latexCode = "";
     [ObservableProperty] private string pdfPath = "";
@@ -39,6 +39,7 @@ public partial class MainViewModel : ObservableObject
 
     public ObservableCollection<AcademicDocument> Projects { get; } = [];
     public IReadOnlyList<LatexTemplate> Templates { get; }
+    public IReadOnlyList<LatexEngineKind> Engines { get; } = Enum.GetValues<LatexEngineKind>();
     public IReadOnlyList<ImageLayoutMode> ImageLayouts { get; } = Enum.GetValues<ImageLayoutMode>();
     public IReadOnlyList<ListKind> ListKinds { get; } = Enum.GetValues<ListKind>();
     public IReadOnlyList<ChartKind> ChartKinds { get; } = Enum.GetValues<ChartKind>();
@@ -50,11 +51,30 @@ public partial class MainViewModel : ObservableObject
     {
         Templates = new TemplateService().LoadTemplates();
         SelectedTemplate = Templates.FirstOrDefault();
+        
+        // Load global settings
+        var settings = SettingsStore.Load();
+        IsDarkTheme = settings.IsDarkTheme;
+        Document.Engine = Enum.TryParse<LatexEngineKind>(settings.DefaultEngine, out var engine) ? engine : LatexEngineKind.PdfLatex;
+        Document.CustomEnginePath = settings.CustomEnginePath;
+
         Projects.Add(Document);
         SelectedElement = Document.Elements.FirstOrDefault();
         HookDocument(Document);
         CaptureUndo();
         Regenerate();
+    }
+
+    partial void OnIsDarkThemeChanged(bool value) => SaveAppSettings();
+
+    private void SaveAppSettings()
+    {
+        SettingsStore.Save(new AppSettings
+        {
+            IsDarkTheme = IsDarkTheme,
+            DefaultEngine = Document.Engine.ToString(),
+            CustomEnginePath = Document.CustomEnginePath ?? ""
+        });
     }
 
     partial void OnSelectedTemplateChanged(LatexTemplate? value) => Regenerate();
@@ -64,6 +84,7 @@ public partial class MainViewModel : ObservableObject
         HookDocument(value);
         SelectedElement = value.Elements.FirstOrDefault();
         Regenerate();
+        SaveAppSettings();
     }
 
     partial void OnSelectedProjectIndexChanged(int value)
@@ -71,13 +92,15 @@ public partial class MainViewModel : ObservableObject
         if (value >= 0 && value < Projects.Count)
         {
             Document = Projects[value];
+            IsProjectView = true;
+            IsSettingsOpen = false;
         }
     }
 
     [RelayCommand]
     private void NewProject()
     {
-        var project = AcademicDocument.CreateSample();
+        var project = new AcademicDocument();
         project.Name = $"Projeto {Projects.Count + 1}";
         Projects.Add(project);
         SelectedProjectIndex = Projects.Count - 1;
@@ -91,6 +114,21 @@ public partial class MainViewModel : ObservableObject
         table.Title = $"Tabela {Document.Elements.OfType<TableElement>().Count() + 1}";
         AddElement(table);
     }
+
+    [ObservableProperty] private bool isSettingsOpen;
+    [ObservableProperty] private bool isProjectView = true;
+
+    partial void OnIsSettingsOpenChanged(bool value)
+    {
+        if (value)
+        {
+            IsProjectView = false;
+            SelectedProjectIndex = -1;
+        }
+    }
+
+    [RelayCommand]
+    private void OpenSettings() => IsSettingsOpen = true;
 
     [RelayCommand]
     private void AddImage()
@@ -301,10 +339,10 @@ private void AddImagePlaceholder()
 {
     if (SelectedElement is not ImageElement image) return;
 
-    image.Images.Add(new ImageItem { Path = "caminho/para/imagem.png", Caption = "Legenda da Imagem" });
+    var newItem = new ImageItem { Path = "caminho/para/imagem.png", Caption = "Legenda da Imagem" };
+    image.Images.Add(newItem);
     Regenerate();
-}
-[RelayCommand]
+}[RelayCommand]
 private void RemoveImage(ImageItem item)
 {
     if (SelectedElement is ImageElement image)
@@ -314,12 +352,74 @@ private void RemoveImage(ImageItem item)
     }
 }
 
+[RelayCommand]
+private void MoveImageUp(ImageItem item)
+{
+    if (SelectedElement is ImageElement image)
+    {
+        int index = image.Images.IndexOf(item);
+        if (index > 0)
+        {
+            image.Images.Move(index, index - 1);
+            CaptureUndo();
+            Regenerate();
+        }
+    }
+}
+
+[RelayCommand]
+private void MoveImageDown(ImageItem item)
+{
+    if (SelectedElement is ImageElement image)
+    {
+        int index = image.Images.IndexOf(item);
+        if (index < image.Images.Count - 1)
+        {
+            image.Images.Move(index, index + 1);
+            CaptureUndo();
+            Regenerate();
+        }
+    }
+}
     [RelayCommand]
     private void AddListItem()
     {
         if (SelectedElement is ListElement list)
         {
             list.Items.Add(new ListItemNode { Text = "Novo item" });
+            CaptureUndo();
+            Regenerate();
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveListItem(ListItemNode item)
+    {
+        if (SelectedElement is ListElement list)
+        {
+            list.Items.Remove(item);
+            CaptureUndo();
+            Regenerate();
+        }
+    }
+
+    [RelayCommand]
+    private void AddChartSeries()
+    {
+        if (SelectedElement is ChartElement chart)
+        {
+            chart.Series.Add(new ChartSeries { Name = "Nova Série", Color = "blue", Values = { 10, 20 } });
+            CaptureUndo();
+            Regenerate();
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveChartSeries(ChartSeries series)
+    {
+        if (SelectedElement is ChartElement chart)
+        {
+            chart.Series.Remove(series);
             CaptureUndo();
             Regenerate();
         }
@@ -366,12 +466,12 @@ private void RemoveImage(ImageItem item)
             if (result.IsValid)
             {
                 LicenseInfo = result.Message;
-                MessageBox.Show(result.Message, "Informação da Licença", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(result.Message, "Estado da Licença", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
                 LicenseInfo = "Licença Inválida";
-                MessageBox.Show(result.Message, "Erro de Licença", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(result.Message, "Licença Inválida", MessageBoxButton.OK, MessageBoxImage.Error);
                 Application.Current.Shutdown();
             }
         }
@@ -597,7 +697,14 @@ private void RemoveImage(ImageItem item)
         foreach (var child in item.Children) HookListItem(child);
     }
 
-    private void OnElementPropertyChanged(object? sender, PropertyChangedEventArgs e) => Regenerate();
+    private void OnElementPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        Regenerate();
+        if (e.PropertyName is nameof(AcademicDocument.Engine) or nameof(AcademicDocument.CustomEnginePath))
+        {
+            SaveAppSettings();
+        }
+    }
 
     private void CaptureUndo()
     {
