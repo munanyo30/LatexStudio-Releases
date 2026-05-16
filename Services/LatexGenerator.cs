@@ -241,14 +241,23 @@ public sealed class LatexGenerator
         builder.AppendLine("\\begin{figure}[htbp]");
         builder.AppendLine("\\centering");
 
-        var defaultWidth = image.LayoutMode switch
+        int columns = image.LayoutMode switch
         {
-            ImageLayoutMode.TwoHorizontal or ImageLayoutMode.Grid2x2 => 0.46,
-            _ => 0.85
+            ImageLayoutMode.Grid2x1 or ImageLayoutMode.Grid2x2 => 2,
+            _ => 1
         };
 
-        foreach (var item in image.Images)
+        double defaultWidth = image.LayoutMode switch
         {
+            ImageLayoutMode.Grid2x1 or ImageLayoutMode.Grid2x2 => 0.46,
+            ImageLayoutMode.Grid1x2 => 0.9,
+            ImageLayoutMode.Grid1x1 or ImageLayoutMode.Single => 0.85,
+            _ => 0.46
+        };
+
+        for (int i = 0; i < image.Images.Count; i++)
+        {
+            var item = image.Images[i];
             var width = image.LayoutMode == ImageLayoutMode.Custom ? item.WidthPercent : defaultWidth;
             
             if (image.UseSubfigures && image.Images.Count > 1)
@@ -258,8 +267,19 @@ public sealed class LatexGenerator
                 builder.AppendLine($"\\includegraphics[width=\\linewidth]{{{NormalizePath(item.Path)}}}");
                 if (!string.IsNullOrWhiteSpace(item.Caption)) builder.AppendLine($"\\caption{{{Escape(item.Caption)}}}");
                 builder.AppendLine("\\end{subfigure}");
-                if (image.LayoutMode is ImageLayoutMode.TwoVertical) builder.AppendLine("\\par\\vspace{0.5em}");
-                else builder.AppendLine("\\hfill");
+                
+                // Layout logic
+                bool isLastInRow = (i + 1) % columns == 0;
+                bool isLastOverall = (i + 1) == image.Images.Count;
+
+                if (isLastInRow || isLastOverall)
+                {
+                    builder.AppendLine("\\\\ \\vspace{0.5em}");
+                }
+                else
+                {
+                    builder.AppendLine("\\hfill");
+                }
             }
             else
             {

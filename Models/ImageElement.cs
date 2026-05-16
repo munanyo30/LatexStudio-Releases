@@ -24,6 +24,6 @@ public partial class ImageElement : DocumentElement
             new ImageItem { Path = "assets/figura-a.pdf", Caption = "Módulo A" },
             new ImageItem { Path = "assets/figura-b.pdf", Caption = "Módulo B" }
         },
-        LayoutMode = ImageLayoutMode.TwoHorizontal
+        LayoutMode = ImageLayoutMode.Grid2x1
     };
 }

@@ -27,5 +27,5 @@ public sealed class ProjectStore
     public string Serialize(AcademicDocument document) => JsonSerializer.Serialize(document, Options);
 
     public AcademicDocument Deserialize(string json)
-        => JsonSerializer.Deserialize<AcademicDocument>(json, Options) ?? AcademicDocument.CreateSample();
+        => JsonSerializer.Deserialize<AcademicDocument>(json, Options) ?? new AcademicDocument();
 }

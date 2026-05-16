@@ -21,4 +21,5 @@
     <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}" />
     <SolidColorBrush x:Key="ScrollBarThumbBrush" Color="{StaticResource ScrollBarThumbColor}" />
     <SolidColorBrush x:Key="ScrollBarThumbHoverBrush" Color="{StaticResource ScrollBarThumbHoverColor}" />
+    <SolidColorBrush x:Key="PaperBackgroundBrush" Color="White" />
 </ResourceDictionary>

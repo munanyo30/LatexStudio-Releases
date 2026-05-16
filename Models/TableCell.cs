@@ -12,9 +12,9 @@ public partial class TableCell : ObservableObject
     [ObservableProperty] private bool isMergedChild;
     [ObservableProperty] private HorizontalCellAlignment horizontalAlignment = HorizontalCellAlignment.Center;
     [ObservableProperty] private VerticalCellAlignment verticalAlignment = VerticalCellAlignment.Middle;
-    [ObservableProperty] private string background = "#FFFFFFFF";
-    [ObservableProperty] private string foreground = "#FF111827";
-    [ObservableProperty] private string borderColor = "#FF111827";
+    [ObservableProperty] private string background = "Transparent";
+    [ObservableProperty] private string foreground = "";
+    [ObservableProperty] private string borderColor = "";
     [ObservableProperty] private double borderThickness = 0.8;
     [ObservableProperty] private double padding = 6;
     [ObservableProperty] private string fontFamily = "Segoe UI";
