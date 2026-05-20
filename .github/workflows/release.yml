@@ -30,9 +30,13 @@ jobs:
 
     - name: 4. Gerar MSI via WiX
       run: |
-        # Usamos as ferramentas WiX que já estão no Windows do GitHub
-        heat dir bin/Release/net8.0-windows -dr INSTALLFOLDER -ke -srd -cg ProductComponents -var var.SourceDir -gg -out components.wxs
-        candle -dSourceDir=bin/Release/net8.0-windows Product.wxs components.wxs
+        # 1. 'Heat' lista os ficheiros da pasta. Usamos -scom -sreg -sfrag para ignorar metadados de DLLs .NET
+        heat dir "bin/Release/net8.0-windows" -dr INSTALLFOLDER -ke -srd -cg ProductComponents -var var.SourceDir -gg -scom -sreg -sfrag -out components.wxs
+        
+        # 2. 'Candle' compila os ficheiros .wxs em .wixobj (usamos aspas no SourceDir)
+        candle -dSourceDir="bin/Release/net8.0-windows" Product.wxs components.wxs
+        
+        # 3. 'Light' liga os objetos no instalador .msi final
         light -out LatexStudio_Setup.msi Product.wixobj components.wixobj
 
     - name: 5. Sincronizar Tag no Repositório Público
