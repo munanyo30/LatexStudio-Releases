@@ -40,7 +40,6 @@ jobs:
         token: ${{ secrets.RELEASE_TOKEN }}
         name: Latex Studio ${{ github.ref_name }}
         tag_name: ${{ github.ref_name }}
-        target_commitish: master 
         files: Output/LatexStudio_Setup.exe
         generate_release_notes: true
         make_latest: true
