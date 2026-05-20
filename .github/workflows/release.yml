@@ -40,8 +40,11 @@ jobs:
         light -out LatexStudio_Setup.msi Product.wixobj components.wixobj
 
     - name: 5. Sincronizar Tag no Repositório Público
-      # Este passo garante que a tag v1.x.x existe lá, evitando o erro 400
+      # Removemos os headers de autenticação padrão para forçar o uso do RELEASE_TOKEN
       run: |
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+        git config --local --unset-all http.https://github.com/.extraheader || true
         git remote add public https://${{ secrets.RELEASE_TOKEN }}@github.com/munanyo30/LatexStudio-Releases.git
         git push public ${{ github.ref_name }}
 
