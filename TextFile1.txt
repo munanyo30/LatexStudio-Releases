@@ -117,3 +117,144 @@ Dark mode automático conforme SO.
 GPU accelerated rendering.
 Multi-monitor support.
 Auto-update system.
+
+
+ Como Engenheiro de Software Sénior e Engenheiro de Marketing, vejo um enorme potencial no Latex Studio. A ponte entre a complexidade do LaTeX e uma interface visual (WYSIWYG/WYSIWYM) é uma dor real para
+  muitos estudantes e investigadores.
+
+  Aqui estão as minhas visões estratégicas para o produto, divididas pelas duas áreas, e em seguida, o guia completo para automação de Releases.
+
+  ---
+
+  🧠 Visão do Engenheiro de Software Sénior (Melhorias de Produto & Arquitetura)
+
+  O objetivo técnico é tornar a aplicação mais robusta, extensível e "à prova de bala" para o utilizador que não quer saber como o LaTeX funciona por trás.
+
+   1. Preview em Tempo Real Integrado (Live Render):
+      - A Ideia: Atualmente geramos o código LaTeX. O próximo passo lógico é integrar um renderer leve (como o MathJax para fórmulas em CefSharp/WebView2 ou uma chamada assíncrona ao pdflatex) que mostre o
+        documento compilado lado a lado enquanto o utilizador escreve.
+   2. Gestão de Bibliografia (Integração Zotero/Mendeley):
+      - A Ideia: O utilizador não devia copiar e colar o BibTeX. Devíamos permitir importar um .bib e ter uma interface visual de pesquisa de citações. Ao clicar num botão "Inserir Citação", a app mostra a
+        lista de autores/títulos carregados.
+   3. Templates Personalizáveis Visualmente:
+      - A Ideia: Permitir que o utilizador crie estilos (margens, fontes, estilos de capítulos) através de menus dropdown, e a aplicação gera o ficheiro .sty ou o preâmbulo correspondente.
+   4. Validação e Linter de LaTeX Interno:
+      - A Ideia: Antes de enviar para o compilador (que dá erros encriptados como vimos nas tabelas), a app deve analisar o modelo de dados e avisar: "Atenção: A Tabela 1 tem colunas a mais para o layout
+        escolhido".
+   5. Arquitetura de Plugins:
+      - A Ideia: Criar uma interface IElementPlugin para que a comunidade possa criar os seus próprios geradores visuais (ex: um gerador de circuitos elétricos com TikZ).
+
+  ---
+
+  📈 Visão do Engenheiro de Marketing (Crescimento e Aquisição)
+
+  O objetivo do marketing é vender a solução "LaTeX sem lágrimas" para o nicho certo.
+
+   1. Posicionamento "Tese de Mestrado em 30 Dias":
+      - A Ideia: O nosso público-alvo são estudantes em pânico. A mensagem deve focar-se em tempo ganho. Tagline: "Foque-se na sua pesquisa, nós tratamos da formatação."
+   2. Modelos "Ready-to-Use" por Universidade:
+      - A Ideia: Distribuir a app com templates pré-configurados (margens, capas, logos) das 10 maiores universidades do país. É um "growth hack" incrível. Um aluno diz a outro: "Usei o Latex Studio e já vinha
+        com o formato da nossa faculdade aprovado".
+   3. Integração Export-to-Overleaf como "Cavalo de Troia":
+      - A Ideia: Já tens o export para o Overleaf. Devemos capitalizar isso. Promover a app como o melhor editor visual para usar em conjunto com o Overleaf para trabalho de equipa. "Faça as tabelas dolorosas
+        visualmente no Latex Studio, e envie com um clique para a sua equipa no Overleaf."
+   4. Modelo Freemium Inteligente:
+      - A Ideia: A versão base (Textos, Listas, Equações) é grátis. Funcionalidades avançadas (Gerador de Tabelas Complexas, Gráficos PGFPlots dinâmicos, Templates de Universidade) estão por trás da licença
+        PRO que tu já tens implementada.
+
+  ---
+
+  🚀 Guia Completo: CI/CD com GitHub Actions para gerar Instaladores (.msi / .exe)
+
+  Visto que tens um ficheiro LatexStudio.iss e LicenseGenerator.iss no teu projeto, assumo que usas o Inno Setup para criar instaladores .exe (muito comum em WPF). Vou ensinar-te a automatizar isto, desde o
+  commit até a release estar pública no GitHub.
+
+  Passo 1: O Fluxo de Trabalho (Workflow) do Desenvolvedor
+
+  A automação baseia-se em Tags do Git. Tu não queres lançar um instalador por cada letra que mudas, apenas quando fechas uma versão.
+
+   1. Fazes as tuas alterações no código.
+   2. Fazes o commit normalmente:
+     git add .
+     git commit -m "feat: Adicionado editor visual de equacoes"
+     git push origin main
+   3. Quando achas que o software está pronto para o público (ex: Versão 1.2.0), crias uma Tag:
+     git tag v1.2.0
+     git push origin v1.2.0
+
+  O empurrão (push) desta tag v1.x.x é o gatilho que diz ao GitHub: "Ei, compila isto e gera o instalador!"
+
+  Passo 2: Preparar o Ficheiro Inno Setup (.iss)
+
+  Garante que no teu LatexStudio.iss, o caminho do executável de saída (diretório Output) e a versão estão parametrizados ou fixos de forma que o servidor do GitHub os encontre. O GitHub Actions vai compilar o
+  teu código (WPF/C#) para a pasta bin\Release\netX.0-windows\ (ou similar) e o Inno Setup vai buscar aí o .exe principal.
+
+  Passo 3: Criar o ficheiro do GitHub Actions
+
+  Tens de criar um ficheiro no teu repositório no caminho .github/workflows/release.yml. O GitHub vai lê-lo automaticamente.
+
+  Eis um exemplo clássico para WPF (.NET Core/5/6/7/8) usando Inno Setup:
+
+    1 name: Gerar Release (Inno Setup)
+    2
+    3 # 1. Este script apenas corre quando fazes push de uma Tag que comece por "v"
+    4 on:
+    5   push:
+    6     tags:
+    7       - 'v*'
+    8
+    9 jobs:
+   10   build-and-release:
+   11     runs-on: windows-latest # Precisamos de Windows para WPF e Inno Setup
+   12
+   13     steps:
+   14     - name: Fazer Checkout do Código
+   15       uses: actions/checkout@v4
+   16
+   17     - name: Instalar .NET Core
+   18       uses: actions/setup-dotnet@v4
+   19       with:
+   20         dotnet-version: '8.0.x' # Altera para a versão que usas (ex: 6.0.x)
+   21
+   22     - name: Restaurar Dependências
+   23       run: dotnet restore LatexStudio.sln
+   24
+   25     - name: Compilar a Aplicação (Publish)
+   26       # Compila o projeto criando um .exe standalone na pasta Release
+   27       run: dotnet publish LatexStudio.sln -c Release -p:PublishProfile=FolderProfile
+   28
+   29       # NOTA: O teu ficheiro LatexStudio.iss DEVE estar configurado para
+   30       # ler os ficheiros resultantes desta pasta de publish (geralmente bin\Release\net8.0-windows\publish)
+   31
+   32     - name: Compilar Instalador com Inno Setup
+   33       # O Inno Setup já vem pré-instalado nas máquinas windows-latest do GitHub!
+   34       run: iscc LatexStudio.iss
+   35
+   36     - name: Criar Release no GitHub e Anexar Ficheiro
+   37       uses: softprops/action-gh-release@v1
+   38       with:
+   39         # Pega no nome da tag (ex: v1.2.0) para dar nome à Release
+   40         name: Latex Studio Release ${{ github.ref_name }}
+   41         # Diz onde o Inno Setup guardou o instalador
+   42         files: Output/LatexStudio_Setup.exe
+   43         # Opcional: Adiciona notas de lançamento automáticas geradas pelos commits
+   44         generate_release_notes: true
+   45       env:
+   46         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  Como Testar isto na Prática?
+
+   1. Cria a pasta .github/workflows na raiz do teu projeto.
+   2. Guarda o código acima num ficheiro chamado release.yml.
+   3. Certifica-te que no teu ficheiro LatexStudio.iss a linha Source: aponta para onde o comando dotnet publish vai atirar os ficheiros (ou altera o script do github para mover os ficheiros para onde o .iss
+      espera).
+   4. Faz commit desta configuração.
+   5. No teu terminal corre:
+
+   1    git tag v1.0.0
+   2    git push origin v1.0.0
+   6. Vai ao GitHub, na aba "Actions". Vais ver um processo a correr chamado "Gerar Release".
+   7. Quando terminar, vai à página principal do repositório no GitHub, na secção "Releases" (lado direito). Estará lá a tua versão v1.0.0 com o ficheiro LatexStudio_Setup.exe pronto a transferir!
+
+  Com isto configurado, nunca mais tens de gerar os instaladores manualmente no teu computador. Fica tudo automático, seguro e organizado. Que te parece a visão? Queres que configure o ficheiro release.yml
+  para ti fisicamente no projeto?

@@ -1,0 +1,39 @@
+name: Gerar Release Automática
+
+on:
+  push:
+    tags:
+      - 'v*' # Gatilho: Qualquer tag que comece por 'v' (ex: v1.0.1)
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: 1. Checkout do Código
+      uses: actions/checkout@v4
+
+    - name: 2. Configurar .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: 3. Restaurar Dependências
+      run: dotnet restore LatexStudio.sln
+
+    - name: 4. Compilar App (Release)
+      # Compilamos para a pasta bin\Release\net8.0-windows conforme o seu .iss espera
+      run: dotnet build LatexStudio.csproj -c Release --no-restore
+
+    - name: 5. Gerar Instalador (Inno Setup)
+      # O Inno Setup já está no PATH das máquinas do GitHub
+      run: iscc LatexStudio.iss
+
+    - name: 6. Criar Release no GitHub
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Latex Studio ${{ github.ref_name }}
+        files: Output/LatexStudio_Setup.exe
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

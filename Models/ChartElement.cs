@@ -15,6 +15,21 @@ public partial class ChartElement : DocumentElement
     public ObservableCollection<string> Categories { get; } = [];
     public ObservableCollection<ChartSeries> Series { get; } = [];
 
+    public string CategoriesRaw
+    {
+        get => string.Join(", ", Categories);
+        set
+        {
+            var parts = value.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+            Categories.Clear();
+            foreach (var p in parts)
+            {
+                Categories.Add(p.Trim());
+            }
+            OnPropertyChanged(nameof(CategoriesRaw));
+        }
+    }
+
     public override DocumentElementKind Kind => DocumentElementKind.Chart;
     public override string DisplayName => $"Gráfico: {Title}";
 

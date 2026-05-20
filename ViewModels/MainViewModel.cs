@@ -36,6 +36,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private int selectedProjectIndex;
     [ObservableProperty] private LatexTemplate? selectedTemplate;
     private bool isRegenerating;
+    private bool isRestoring;
 
     public ObservableCollection<AcademicDocument> Projects { get; } = [];
     public IReadOnlyList<LatexTemplate> Templates { get; }
@@ -46,12 +47,38 @@ public partial class MainViewModel : ObservableObject
     public IReadOnlyList<SectionLevel> SectionLevels { get; } = Enum.GetValues<SectionLevel>();
     public IReadOnlyList<LatexStudio.Models.TextAlignment> TextAlignments { get; } = Enum.GetValues<LatexStudio.Models.TextAlignment>();
     public IReadOnlyList<TheoremKind> TheoremKinds { get; } = Enum.GetValues<TheoremKind>();
+    public IReadOnlyList<LatexSymbol> GreekLetters { get; } = LatexSymbolData.GreekLetters;
+    public IReadOnlyList<LatexSymbol> Operators { get; } = LatexSymbolData.Operators;
+    public IReadOnlyList<LatexSymbol> Relations { get; } = LatexSymbolData.Relations;
+    public IReadOnlyList<LatexSymbol> Structures { get; } = LatexSymbolData.Structures;
+    public IReadOnlyList<string> ProgrammingLanguages { get; } = new List<string>
+    {
+        "C", "C++", "C#", "Java", "Python", "JavaScript", "TypeScript", "PHP", "Ruby", "Swift",
+        "Go", "Rust", "Kotlin", "Scala", "Haskell", "SQL", "HTML", "CSS", "LaTeX", "Bash",
+        "R", "Matlab", "Fortran", "Assembly", "Lua", "Perl", "VHDL", "Verilog"
+    }.OrderBy(x => x).ToList();
+
+    [ObservableProperty] private bool isUpdateAvailable;
+    [ObservableProperty] private string updateVersion = "";
+    [ObservableProperty] private string updateUrl = "";
+
+    private readonly UpdateService updateService = new();
+    private readonly System.Windows.Threading.DispatcherTimer undoTimer;
 
     public MainViewModel()
     {
+        undoTimer = new System.Windows.Threading.DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
+        undoTimer.Tick += (s, e) => {
+            undoTimer.Stop();
+            CaptureUndo();
+        };
+
         Templates = new TemplateService().LoadTemplates();
         SelectedTemplate = Templates.FirstOrDefault();
-        
+
         // Load global settings
         var settings = SettingsStore.Load();
         IsDarkTheme = settings.IsDarkTheme;
@@ -63,8 +90,29 @@ public partial class MainViewModel : ObservableObject
         HookDocument(Document);
         CaptureUndo();
         Regenerate();
+        CheckForUpdates();
     }
 
+    private async void CheckForUpdates()
+    {
+        var (available, version, url) = await updateService.CheckForUpdatesAsync();
+        IsUpdateAvailable = available;
+        UpdateVersion = version;
+        UpdateUrl = url;
+    }
+
+    [RelayCommand]
+    private void DownloadUpdate()
+    {
+        if (!string.IsNullOrEmpty(UpdateUrl))
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = UpdateUrl,
+                UseShellExecute = true
+            });
+        }
+    }
     partial void OnIsDarkThemeChanged(bool value) => SaveAppSettings();
 
     private void SaveAppSettings()
@@ -110,7 +158,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void AddTable()
     {
-        var table = TableElement.CreateExample();
+        var table = TableElement.CreateRaw();
         table.Title = $"Tabela {Document.Elements.OfType<TableElement>().Count() + 1}";
         AddElement(table);
     }
@@ -196,6 +244,17 @@ public partial class MainViewModel : ObservableObject
         AddElement(custom);
     }
 
+    [RelayCommand]
+    private void InsertEquationSymbol(string symbol)
+    {
+        if (SelectedElement is EquationElement equation)
+        {
+            equation.Formula += symbol;
+            CaptureUndo();
+            Regenerate();
+        }
+    }
+
     [RelayCommand(CanExecute = nameof(CanMoveUp))]
     private void MoveUp()
     {
@@ -267,7 +326,7 @@ public partial class MainViewModel : ObservableObject
     {
         if (SelectedElement is TableElement table)
         {
-            table.AddColumn($"Coluna {table.Rows.FirstOrDefault()?.Cells.Count + 1}");
+            table.AddColumn("");
             CaptureUndo();
             Regenerate();
         }
@@ -342,6 +401,7 @@ private void AddImagePlaceholder()
     var newItem = new ImageItem { Path = "caminho/para/imagem.png", Caption = "Legenda da Imagem" };
     image.Images.Add(newItem);
     Regenerate();
+    CaptureUndo();
 }[RelayCommand]
 private void RemoveImage(ImageItem item)
 {
@@ -349,6 +409,7 @@ private void RemoveImage(ImageItem item)
     {
         image.Images.Remove(item);
         Regenerate();
+        CaptureUndo();
     }
 }
 
@@ -361,8 +422,8 @@ private void MoveImageUp(ImageItem item)
         if (index > 0)
         {
             image.Images.Move(index, index - 1);
-            CaptureUndo();
             Regenerate();
+            CaptureUndo();
         }
     }
 }
@@ -376,8 +437,8 @@ private void MoveImageDown(ImageItem item)
         if (index < image.Images.Count - 1)
         {
             image.Images.Move(index, index + 1);
-            CaptureUndo();
             Regenerate();
+            CaptureUndo();
         }
     }
 }
@@ -387,8 +448,8 @@ private void MoveImageDown(ImageItem item)
         if (SelectedElement is ListElement list)
         {
             list.Items.Add(new ListItemNode { Text = "Novo item" });
-            CaptureUndo();
             Regenerate();
+            CaptureUndo();
         }
     }
 
@@ -398,8 +459,8 @@ private void MoveImageDown(ImageItem item)
         if (SelectedElement is ListElement list)
         {
             list.Items.Remove(item);
-            CaptureUndo();
             Regenerate();
+            CaptureUndo();
         }
     }
 
@@ -409,8 +470,8 @@ private void MoveImageDown(ImageItem item)
         if (SelectedElement is ChartElement chart)
         {
             chart.Series.Add(new ChartSeries { Name = "Nova Série", Color = "blue", Values = { 10, 20 } });
-            CaptureUndo();
             Regenerate();
+            CaptureUndo();
         }
     }
 
@@ -420,8 +481,8 @@ private void MoveImageDown(ImageItem item)
         if (SelectedElement is ChartElement chart)
         {
             chart.Series.Remove(series);
-            CaptureUndo();
             Regenerate();
+            CaptureUndo();
         }
     }
 
@@ -582,7 +643,11 @@ private void MoveImageDown(ImageItem item)
     private void Undo()
     {
         if (undo.Count <= 1) return;
+        
+        // Push current state to redo
         redo.Push(undo.Pop());
+        
+        // Restore previous state
         Restore(undo.Peek());
     }
 
@@ -590,6 +655,7 @@ private void MoveImageDown(ImageItem item)
     private void Redo()
     {
         if (redo.Count == 0) return;
+        
         var snapshot = redo.Pop();
         undo.Push(snapshot);
         Restore(snapshot);
@@ -610,18 +676,18 @@ private void MoveImageDown(ImageItem item)
         if (image is null) return;
         foreach (var file in files)
         {
-            image.Images.Add(new ImageItem { Path = "caminho/para/imagem.png", Caption = "Nova Imagem" });
+            image.Images.Add(new ImageItem { Path = file, Caption = Path.GetFileNameWithoutExtension(file) });
         }
-        CaptureUndo();
         Regenerate();
+        CaptureUndo();
     }
 
     private void AddElement(DocumentElement element)
     {
         Document.Elements.Add(element);
         SelectedElement = element;
-        CaptureUndo();
         Regenerate();
+        CaptureUndo();
     }
 
     private void HookDocument(AcademicDocument document)
@@ -699,7 +765,16 @@ private void MoveImageDown(ImageItem item)
 
     private void OnElementPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (isRestoring) return;
         Regenerate();
+        
+        // Don't capture undo for status/latex updates to avoid infinite loops or overhead
+        if (e.PropertyName is not (nameof(LatexCode) or nameof(Status) or nameof(IsUpdateAvailable)))
+        {
+            undoTimer.Stop();
+            undoTimer.Start();
+        }
+
         if (e.PropertyName is nameof(AcademicDocument.Engine) or nameof(AcademicDocument.CustomEnginePath))
         {
             SaveAppSettings();
@@ -708,6 +783,7 @@ private void MoveImageDown(ImageItem item)
 
     private void CaptureUndo()
     {
+        if (isRestoring) return;
         undo.Push(projectStore.Serialize(Document));
         redo.Clear();
         UndoCommand.NotifyCanExecuteChanged();
@@ -716,24 +792,42 @@ private void MoveImageDown(ImageItem item)
 
     private void Restore(string snapshot)
     {
-        Document = projectStore.Deserialize(snapshot);
-        
-        // Safety check to prevent ArgumentOutOfRangeException
-        if (SelectedProjectIndex >= 0 && SelectedProjectIndex < Projects.Count)
+        isRestoring = true;
+        try
         {
-            Projects[SelectedProjectIndex] = Document;
-        }
-        else
-        {
-            // Fallback: if index is lost, re-add or sync based on the current Document
-            Projects.Clear();
-            Projects.Add(Document);
-            SelectedProjectIndex = 0;
-        }
+            var oldSelectedId = SelectedElement?.Id;
+            
+            Document = projectStore.Deserialize(snapshot);
+            
+            // Re-sync selection using Guid ID
+            if (oldSelectedId != null)
+            {
+                SelectedElement = Document.Elements.FirstOrDefault(e => e.Id == oldSelectedId);
+            }
+            else
+            {
+                SelectedElement = Document.Elements.FirstOrDefault();
+            }
 
-        Regenerate();
-        UndoCommand.NotifyCanExecuteChanged();
-        RedoCommand.NotifyCanExecuteChanged();
+            if (SelectedProjectIndex >= 0 && SelectedProjectIndex < Projects.Count)
+            {
+                Projects[SelectedProjectIndex] = Document;
+            }
+            else
+            {
+                Projects.Clear();
+                Projects.Add(Document);
+                SelectedProjectIndex = 0;
+            }
+
+            Regenerate();
+        }
+        finally
+        {
+            isRestoring = false;
+            UndoCommand.NotifyCanExecuteChanged();
+            RedoCommand.NotifyCanExecuteChanged();
+        }
     }
 
     private void SaveAutosave()

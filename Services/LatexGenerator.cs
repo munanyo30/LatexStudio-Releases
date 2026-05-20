@@ -124,7 +124,7 @@ public sealed class LatexGenerator
         packages.Add("\\usepackage{colortbl}");
         packages.Add("\\usepackage{array}");
 
-        var columnCount = table.Rows.FirstOrDefault()?.Cells.Count ?? 0;
+        var columnCount = Math.Max(1, table.Rows.FirstOrDefault()?.Cells.Count ?? 0);
         var columns = table.UseTabularX
             ? string.Concat(Enumerable.Repeat(">{\\centering\\arraybackslash}X", columnCount))
             : string.Concat(Enumerable.Repeat("c", columnCount));
@@ -148,18 +148,8 @@ public sealed class LatexGenerator
             {
                 var cell = row.Cells[c];
 
-                // If this cell is a merged child, we might still need to skip it or add a placeholder
                 if (cell.IsMergedChild)
                 {
-                    // If it's a child of a horizontal merge (columnSpan > 1 in SAME row), skip it.
-                    // LaTeX's \multicolumn handles the horizontal space.
-                    // If it's ONLY a child of a vertical merge (from a row ABOVE), 
-                    // we need to provide an empty slot (&) unless it's ALSO covered by a horizontal span from above.
-                    
-                    // Logic: Find the "root" cell for this coordinate.
-                    // For simplicity in tabular, we skip children that are part of a horizontal span.
-                    // But we MUST account for vertical spans from rows above.
-                    
                     bool isHorizontalChild = false;
                     for (int checkCol = c - 1; checkCol >= 0; checkCol--)
                     {
@@ -173,10 +163,6 @@ public sealed class LatexGenerator
 
                     if (isHorizontalChild) continue;
 
-                    // If it's NOT a horizontal child, it must be a vertical child.
-                    // We need an empty & slot here. If the parent ABOVE also had ColumnSpan > 1, 
-                    // we should use multicolumn{N}{c}{} to keep borders correct.
-                    
                     int parentColSpan = 1;
                     for (int checkRow = r - 1; checkRow >= 0; checkRow--)
                     {
@@ -191,7 +177,7 @@ public sealed class LatexGenerator
                     if (parentColSpan > 1)
                     {
                         cells.Add($"\\multicolumn{{{parentColSpan}}}{{c}}{{}}");
-                        c += (parentColSpan - 1); // Skip the rest of this multicolumn span
+                        c += (parentColSpan - 1);
                     }
                     else
                     {
@@ -202,12 +188,16 @@ public sealed class LatexGenerator
 
                 var text = Escape(cell.Text);
                 if (cell.IsHeader) text = $"\\textbf{{{text}}}";
-                if (!IsWhite(cell.Background))
+                
+                if (IsHexColor(cell.Background))
                 {
                     text = $"\\cellcolor[HTML]{{{ToHtmlColor(cell.Background)}}}{text}";
                 }
+                else if (!string.IsNullOrWhiteSpace(cell.Background) && !IsTransparent(cell.Background))
+                {
+                    text = $"\\cellcolor{{{cell.Background.ToLowerInvariant()}}}{text}";
+                }
 
-                // If both spans are active, multirow goes inside multicolumn
                 if (cell.RowSpan > 1)
                 {
                     text = $"\\multirow{{{cell.RowSpan}}}{{*}}{{{text}}}";
@@ -547,5 +537,7 @@ public sealed class LatexGenerator
 
     private static string NormalizePath(string path) => path.Replace('\\', '/');
     private static bool IsWhite(string color) => color.Equals("#FFFFFFFF", StringComparison.OrdinalIgnoreCase) || color.Equals("white", StringComparison.OrdinalIgnoreCase);
+    private static bool IsTransparent(string color) => string.IsNullOrWhiteSpace(color) || color.Equals("Transparent", StringComparison.OrdinalIgnoreCase);
+    private static bool IsHexColor(string color) => !string.IsNullOrWhiteSpace(color) && color.StartsWith("#") && (color.Length == 7 || color.Length == 9);
     private static string ToHtmlColor(string color) => color.TrimStart('#').Length == 8 ? color.TrimStart('#')[2..] : color.TrimStart('#');
 }

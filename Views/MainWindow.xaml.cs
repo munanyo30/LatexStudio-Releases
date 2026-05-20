@@ -30,13 +30,13 @@ public partial class MainWindow : Window
         var theme = viewModel.IsDarkTheme ? "Dark.xaml" : "Light.xaml";
         var dictionaries = Application.Current.Resources.MergedDictionaries;
         var oldTheme = dictionaries.FirstOrDefault(d =>
-            d.Source?.OriginalString.EndsWith("Light.xaml", StringComparison.OrdinalIgnoreCase) == true ||
-            d.Source?.OriginalString.EndsWith("Dark.xaml", StringComparison.OrdinalIgnoreCase) == true);
+            d.Source?.OriginalString.Contains("Themes/Light.xaml", StringComparison.OrdinalIgnoreCase) == true ||
+            d.Source?.OriginalString.Contains("Themes/Dark.xaml", StringComparison.OrdinalIgnoreCase) == true);
         if (oldTheme is not null)
         {
             dictionaries.Remove(oldTheme);
         }
-        dictionaries.Insert(0, new ResourceDictionary { Source = new Uri($"Themes/{theme}", UriKind.Relative) });
+        dictionaries.Insert(0, new ResourceDictionary { Source = new Uri($"pack://application:,,,/LatexStudio.Core;component/Themes/{theme}") });
     }
 
     private void OnCellGotFocus(object sender, RoutedEventArgs e)

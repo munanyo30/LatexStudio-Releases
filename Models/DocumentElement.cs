@@ -4,6 +4,7 @@ namespace LatexStudio.Models;
 
 public abstract partial class DocumentElement : ObservableObject
 {
+    [ObservableProperty] private Guid id = Guid.NewGuid();
     [ObservableProperty] private string title = "";
     [ObservableProperty] private string caption = "";
     [ObservableProperty] private string label = "";

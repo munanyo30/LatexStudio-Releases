@@ -1,3 +1,5 @@
+using System.IO;
+
 namespace LatexStudio.Core;
 
 public static class LicenseService

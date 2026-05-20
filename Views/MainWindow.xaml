@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:models="clr-namespace:LatexStudio.Models"
         xmlns:vm="clr-namespace:LatexStudio.ViewModels"
-        xmlns:conv="clr-namespace:LatexStudio.Converters"
+        xmlns:conv="clr-namespace:LatexStudio.Core.Converters;assembly=LatexStudio.Core"
         Title="Latex Studio"
         Icon="pack://application:,,,/latexStudio.ico"
         Width="1420"
@@ -167,7 +167,7 @@
                                             <TextBlock Text="Ficheiro" Style="{StaticResource MutedLabel}" /><TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8" />
                                             <TextBlock Text="Legenda" Style="{StaticResource MutedLabel}" /><TextBox Text="{Binding Caption, UpdateSourceTrigger=PropertyChanged}" />
                                         </StackPanel>
-                                        <Button Grid.Column="2" Content="✕" Command="{Binding DataContext.RemoveImageCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" VerticalAlignment="Top" Width="32" Height="32" Foreground="Crimson" FontWeight="Bold" BorderBrush="Crimson" Background="Transparent" />
+                                        <Button Grid.Column="2" Style="{StaticResource DeleteButton}" Command="{Binding DataContext.RemoveImageCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" VerticalAlignment="Top" />
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -218,19 +218,8 @@
                                                   VerticalAlignment="Center" Margin="0,0,12,0" />
                                         <TextBox Grid.Column="1" Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}" 
                                                  Background="Transparent" BorderThickness="0" FontSize="14" Padding="0" VerticalContentAlignment="Center" />
-                                        <Button Grid.Column="2" Content="✕" Command="{Binding DataContext.RemoveListItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" 
-                                                Width="28" Height="28" Margin="12,0,0,0" Foreground="Crimson" FontWeight="Bold" Background="Transparent" BorderBrush="Transparent" Opacity="0.6">
-                                            <Button.Style>
-                                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                                    <Style.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter Property="Opacity" Value="1" />
-                                                            <Setter Property="Background" Value="#1AEE2B2B" />
-                                                        </Trigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Button.Style>
-                                        </Button>
+                                        <Button Grid.Column="2" Style="{StaticResource DeleteButton}" Command="{Binding DataContext.RemoveListItemCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" 
+                                                Margin="12,0,0,0" />
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -295,9 +284,71 @@
             <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
                 <StackPanel MaxWidth="800" HorizontalAlignment="Left">
                     <TextBlock Text="Editor de Equações" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" />
-                    <TextBlock Text="Fórmula LaTeX" Style="{StaticResource MutedLabel}" /><TextBox Text="{Binding Formula, UpdateSourceTrigger=PropertyChanged}" FontFamily="Cascadia Mono" FontSize="16" AcceptsReturn="True" MinHeight="100" Padding="16" />
-                    <CheckBox Content="Numerar" IsChecked="{Binding IsNumbered}" Margin="0,16,0,16" />
-                    <Border Background="{DynamicResource PanelAltBrush}" CornerRadius="8" Padding="24"><TextBlock Text="{Binding Formula}" FontSize="24" HorizontalAlignment="Center" FontStyle="Italic" Foreground="{DynamicResource AccentBrush}" /></Border>
+                    
+                    <TextBlock Text="Título" Style="{StaticResource MutedLabel}" Margin="0,0,0,4" />
+                    <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,16" />
+
+                    <Border Style="{StaticResource PanelBorder}" Background="{DynamicResource PanelAltBrush}" Padding="16" Margin="0,0,0,20">
+                        <TabControl Background="Transparent" BorderThickness="0">
+                            <TabItem Header="Gregas">
+                                <ScrollViewer MaxHeight="120" Margin="0,8,0,0">
+                                    <ItemsControl ItemsSource="{Binding DataContext.GreekLetters, RelativeSource={RelativeSource AncestorType=Window}}">
+                                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Content="{Binding Label}" Command="{Binding DataContext.InsertEquationSymbolCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding Command}" Margin="2" Padding="8,4" MinWidth="44" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </TabItem>
+                            <TabItem Header="Operadores">
+                                <ScrollViewer MaxHeight="120" Margin="0,8,0,0">
+                                    <ItemsControl ItemsSource="{Binding DataContext.Operators, RelativeSource={RelativeSource AncestorType=Window}}">
+                                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Content="{Binding Label}" Command="{Binding DataContext.InsertEquationSymbolCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding Command}" Margin="2" Padding="8,4" MinWidth="44" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </TabItem>
+                            <TabItem Header="Relações">
+                                <ScrollViewer MaxHeight="120" Margin="0,8,0,0">
+                                    <ItemsControl ItemsSource="{Binding DataContext.Relations, RelativeSource={RelativeSource AncestorType=Window}}">
+                                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Content="{Binding Label}" Command="{Binding DataContext.InsertEquationSymbolCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding Command}" Margin="2" Padding="8,4" MinWidth="44" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </TabItem>
+                            <TabItem Header="Estruturas">
+                                <ScrollViewer MaxHeight="120" Margin="0,8,0,0">
+                                    <ItemsControl ItemsSource="{Binding DataContext.Structures, RelativeSource={RelativeSource AncestorType=Window}}">
+                                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Content="{Binding Label}" Command="{Binding DataContext.InsertEquationSymbolCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding Command}" Margin="2" Padding="8,4" MinWidth="44" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </TabItem>
+                        </TabControl>
+                    </Border>
+
+                    <TextBlock Text="Fórmula LaTeX" Style="{StaticResource MutedLabel}" />
+                    <TextBox Text="{Binding Formula, UpdateSourceTrigger=PropertyChanged}" FontFamily="Cascadia Mono" FontSize="16" AcceptsReturn="True" MinHeight="100" Padding="16" />
+                    <CheckBox Content="Numerar Equação" IsChecked="{Binding IsNumbered}" Margin="0,16,0,16" />
+                    
+                    <TextBlock Text="Pré-visualização" Style="{StaticResource MutedLabel}" Margin="0,0,0,8" />
+                    <Border Background="{DynamicResource PanelAltBrush}" CornerRadius="12" Padding="32" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                        <TextBlock Text="{Binding Formula}" FontSize="26" HorizontalAlignment="Center" FontStyle="Italic" Foreground="{DynamicResource AccentBrush}" TextWrapping="Wrap" />
+                    </Border>
                 </StackPanel>
             </ScrollViewer>
         </DataTemplate>
@@ -307,8 +358,24 @@
             <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
                 <StackPanel MaxWidth="800" HorizontalAlignment="Left">
                     <TextBlock Text="Snippet de Código" FontSize="22" FontWeight="Bold" Margin="0,0,0,20" />
-                    <TextBlock Text="Linguagem" Style="{StaticResource MutedLabel}" /><TextBox Text="{Binding Language, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,16" />
-                    <TextBox Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}" FontFamily="Cascadia Mono" FontSize="13" AcceptsReturn="True" MinHeight="250" Padding="12" />
+                    
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                            <TextBlock Text="Linguagem" Style="{StaticResource MutedLabel}" />
+                            <ComboBox ItemsSource="{Binding DataContext.ProgrammingLanguages, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      SelectedItem="{Binding Language}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Bottom">
+                            <CheckBox Content="Números de Linha" IsChecked="{Binding ShowLineNumbers}" Margin="0,0,0,8" />
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="Código" Style="{StaticResource MutedLabel}" />
+                    <TextBox Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}" FontFamily="Cascadia Mono" FontSize="13" AcceptsReturn="True" MinHeight="300" Padding="16" VerticalContentAlignment="Top" />
                 </StackPanel>
             </ScrollViewer>
         </DataTemplate>
@@ -340,49 +407,69 @@
                 <StackPanel MaxWidth="900" HorizontalAlignment="Left">
                     <TextBlock Text="Configuração de Gráfico" FontSize="24" FontWeight="Bold" Margin="0,0,0,24" />
                     
-                    <Border Style="{StaticResource PanelBorder}" Background="{DynamicResource PanelAltBrush}" Padding="20" Margin="0,0,0,24">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="200" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            
-                            <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,16,16">
-                                <TextBlock Text="Tipo de Gráfico" Style="{StaticResource MutedLabel}" />
-                                <ComboBox ItemsSource="{Binding DataContext.ChartKinds, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding ChartKind}" />
+                    <!-- General Settings -->
+                    <Border Style="{StaticResource PanelBorder}" Background="{DynamicResource PanelAltBrush}" Padding="20" Margin="0,0,0,20">
+                        <StackPanel>
+                            <TextBlock Text="CONFIGURAÇÃO GERAL" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" Margin="0,0,0,16" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                    <TextBlock Text="Título do Gráfico" Style="{StaticResource MutedLabel}" />
+                                    <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" FontSize="14" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="Tipo de Gráfico" Style="{StaticResource MutedLabel}" />
+                                    <ComboBox ItemsSource="{Binding DataContext.ChartKinds, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding ChartKind}" />
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                                <CheckBox Content="Mostrar Grelha" IsChecked="{Binding ShowGrid}" Margin="0,0,24,0" />
+                                <CheckBox Content="Mostrar Legenda" IsChecked="{Binding ShowLegend}" />
                             </StackPanel>
-                            
-                            <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,16">
-                                <TextBlock Text="Título do Gráfico" Style="{StaticResource MutedLabel}" />
-                                <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" FontSize="14" />
-                            </StackPanel>
-                            
-                            <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,16,0">
-                                <TextBlock Text="Eixo X (Categorias)" Style="{StaticResource MutedLabel}" />
-                                <TextBox Text="{Binding XLabel, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                            
-                            <StackPanel Grid.Row="1" Grid.Column="1">
-                                <TextBlock Text="Eixo Y (Valores)" Style="{StaticResource MutedLabel}" />
-                                <TextBox Text="{Binding YLabel, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                        </Grid>
+                        </StackPanel>
                     </Border>
 
-                    <TextBlock Text="Definição de Dados" FontSize="16" FontWeight="SemiBold" Margin="4,0,0,12" />
-                    <StackPanel Margin="0,0,0,20">
-                        <TextBlock Text="Categorias (ex: Jan, Fev, Mar)" Style="{StaticResource MutedLabel}" />
-                        <TextBox Text="{Binding CategoriesRaw, UpdateSourceTrigger=PropertyChanged}" Padding="10,8" />
-                    </StackPanel>
+                    <!-- Axis Labels -->
+                    <Border Style="{StaticResource PanelBorder}" Padding="20" Margin="0,0,0,20">
+                        <StackPanel>
+                            <TextBlock Text="EIXOS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" Margin="0,0,0,16" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                    <TextBlock Text="Rótulo Eixo X (Horizontal)" Style="{StaticResource MutedLabel}" />
+                                    <TextBox Text="{Binding XLabel, UpdateSourceTrigger=PropertyChanged}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="Rótulo Eixo Y (Vertical)" Style="{StaticResource MutedLabel}" />
+                                    <TextBox Text="{Binding YLabel, UpdateSourceTrigger=PropertyChanged}" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Data Definition -->
+                    <TextBlock Text="GESTÃO DE DADOS" FontSize="16" FontWeight="SemiBold" Margin="4,10,0,12" />
+                    
+                    <Border Style="{StaticResource PanelBorder}" Background="{DynamicResource PanelBrush}" Padding="20" Margin="0,0,0,20">
+                        <StackPanel>
+                            <TextBlock Text="Categorias" Style="{StaticResource MutedLabel}" />
+                            <TextBox Text="{Binding CategoriesRaw, UpdateSourceTrigger=PropertyChanged}" 
+                                     Padding="12,10" FontSize="14" />
+                            <TextBlock Text="Dica: Estas categorias aparecerão no eixo X." FontSize="11" FontStyle="Italic" Foreground="{DynamicResource MutedTextBrush}" Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Border>
 
                     <DockPanel Margin="0,0,0,12">
-                        <TextBlock Text="SÉRIES DE DADOS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
-                        <Button Content="+ Adicionar Série" Command="{Binding DataContext.AddChartSeriesCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Right" FontWeight="Bold" />
+                        <TextBlock Text="SÉRIES (DADOS DO GRÁFICO)" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
+                        <Button Content="+ Nova Série de Dados" 
+                                Command="{Binding DataContext.AddChartSeriesCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                Style="{StaticResource AccentButton}" HorizontalAlignment="Right" Padding="16,6" />
                     </DockPanel>
 
                     <ListBox ItemsSource="{Binding Series}" BorderThickness="0" Background="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
@@ -390,30 +477,39 @@
                             <DataTemplate>
                                 <Border Style="{StaticResource PanelBorder}" Margin="0,0,0,12" Padding="16">
                                     <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="2*" />
-                                            <ColumnDefinition Width="1*" />
-                                            <ColumnDefinition Width="3*" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="120" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         
-                                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
-                                            <TextBlock Text="Nome" Style="{StaticResource MutedLabel}" />
-                                            <TextBox Text="{Binding Name}" />
+                                        <StackPanel Grid.Column="0" Margin="0,0,12,12">
+                                            <TextBlock Text="Nome da Série" Style="{StaticResource MutedLabel}" />
+                                            <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" FontWeight="SemiBold" />
                                         </StackPanel>
-                                        <StackPanel Grid.Column="1" Margin="0,0,12,0">
-                                            <TextBlock Text="Cor" Style="{StaticResource MutedLabel}" />
-                                            <TextBox Text="{Binding Color}" />
+                                        
+                                        <StackPanel Grid.Column="1" Margin="0,0,12,12">
+                                            <TextBlock Text="Cor (LaTeX)" Style="{StaticResource MutedLabel}" />
+                                            <TextBox Text="{Binding Color, UpdateSourceTrigger=PropertyChanged}" />
                                         </StackPanel>
-                                        <StackPanel Grid.Column="2">
-                                            <TextBlock Text="Valores" Style="{StaticResource MutedLabel}" />
-                                            <TextBox Text="{Binding ValuesRaw}" />
-                                        </StackPanel>
-                                        <Button Grid.Column="3" 
+
+                                        <Button Grid.Column="2" 
                                                 Style="{StaticResource DeleteButton}"
                                                 Command="{Binding DataContext.RemoveChartSeriesCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
                                                 CommandParameter="{Binding}"
-                                                VerticalAlignment="Bottom" Margin="12,0,0,0" />                                    </Grid>
+                                                VerticalAlignment="Top" />
+
+                                        <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
+                                            <TextBlock Text="Valores numéricos" Style="{StaticResource MutedLabel}" />
+                                            <TextBox Text="{Binding ValuesRaw, UpdateSourceTrigger=PropertyChanged}" 
+                                                     Padding="10,8" FontFamily="Cascadia Mono" />
+                                            <TextBlock Text="Garante que tens o mesmo número de valores que categorias." FontSize="11" FontStyle="Italic" Foreground="{DynamicResource MutedTextBrush}" Margin="0,4,0,0" />
+                                        </StackPanel>
+                                    </Grid>
                                 </Border>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -424,13 +520,25 @@
     </Window.Resources>
 
     <Grid>
-        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="32" /></Grid.RowDefinitions>
+        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="32" /></Grid.RowDefinitions>
+
+        <!-- Update Notification Bar -->
+        <Border Grid.Row="0" Background="{DynamicResource AccentBrush}" Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVis}}" Padding="8">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="🚀 Uma nova versão está disponível! " Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding UpdateVersion, StringFormat='Versão {0}'}" Foreground="White" Opacity="0.9" VerticalAlignment="Center" Margin="0,0,16,0" />
+                <Button Content="Descarregar Agora" Command="{Binding DownloadUpdateCommand}" Background="White" Foreground="{DynamicResource AccentBrush}" Padding="12,2" BorderThickness="0" Height="24" FontSize="11" />
+            </StackPanel>
+        </Border>
 
         <!-- Header -->
-        <Border Grid.Row="0" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="20,10,20,0">
+        <Border Grid.Row="1" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="20,10,20,0">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="0,0,40,8">
-                    <Image Source="pack://application:,,,/latexStudio.ico" Width="24" Height="24" Margin="0,0,12,0" /><TextBlock Text="Latex Studio" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" /><TextBlock Text="PRO" FontSize="10" FontWeight="Bold" Background="{DynamicResource AccentBrush}" Foreground="White" Padding="4,1" Margin="8,0,0,0" VerticalAlignment="Center" />
+                    <Image Source="pack://application:,,,/latexStudio.ico" Width="24" Height="24" Margin="0,0,12,0" /><TextBlock Text="Latex Studio" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+                    <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" Padding="4,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="PRO" FontSize="10" FontWeight="Bold" Foreground="White" />
+                    </Border>
                 </StackPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,8">
                     <Button Content="Novo Projeto" Command="{Binding NewProjectCommand}" Margin="0,0,12,0" /><Button Content="Undo" Command="{Binding UndoCommand}" Width="70" Margin="0,0,4,0" /><Button Content="Redo" Command="{Binding RedoCommand}" Width="70" Margin="0,0,20,0" /><Button Content="Abrir" Command="{Binding OpenProjectCommand}" /><Button Content="Guardar" Command="{Binding SaveProjectCommand}" Style="{StaticResource AccentButton}" Margin="0,0,20,0" /><Button Content="Copiar" Command="{Binding CopyLatexCommand}" /><Button Content=".tex" Command="{Binding ExportTexCommand}" />
@@ -461,7 +569,7 @@
             </DockPanel>
         </Border>
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
             <!-- Settings Tab -->
             <Grid Panel.ZIndex="10" Background="{DynamicResource SurfaceBrush}">
                 <Grid.Style><Style TargetType="Grid"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding IsProjectView}" Value="False"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></Grid.Style>
@@ -512,10 +620,10 @@
                                 <Button Content="+ Imagem" Command="{Binding AddImageCommand}" />
                                 <Button Content="+ Lista" Command="{Binding AddListCommand}" />
                                 <Button Content="+ Gráfico" Command="{Binding AddChartCommand}" />
-                                <Button Content="+ Texto" Command="{Binding AddTextCommand}" Style="{StaticResource AccentButton}" />
-                                <Button Content="+ Equação" Command="{Binding AddEquationCommand}" Style="{StaticResource AccentButton}" />
-                                <Button Content="+ Código" Command="{Binding AddCodeCommand}" Style="{StaticResource AccentButton}" />
-                                <Button Content="+ Teorema" Command="{Binding AddTheoremCommand}" Style="{StaticResource AccentButton}" />
+                                <Button Content="+ Texto" Command="{Binding AddTextCommand}" />
+                                <Button Content="+ Equação" Command="{Binding AddEquationCommand}" />
+                                <Button Content="+ Código" Command="{Binding AddCodeCommand}" />
+                                <Button Content="+ Teorema" Command="{Binding AddTheoremCommand}" />
                                 <Button Content="+ Bib" Command="{Binding AddBibliographyCommand}" />
                                 <Button Content="+ Manual" Command="{Binding AddCustomCodeCommand}" />
                             </UniformGrid>
@@ -574,6 +682,6 @@
                 <Grid Grid.Column="4" Background="{DynamicResource SurfaceBrush}"><Border Style="{StaticResource PaperBorder}" Margin="20" Padding="30"><DockPanel><TextBlock DockPanel.Dock="Top" Text="CÓDIGO LATEX" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" Margin="0,0,0,16" /><TextBox Text="{Binding LatexCode, UpdateSourceTrigger=PropertyChanged}" FontFamily="Cascadia Mono" FontSize="12" AcceptsReturn="True" BorderThickness="0" Background="Transparent" Foreground="{DynamicResource TextBrush}" /></DockPanel></Border></Grid>
             </Grid>
         </Grid>
-        <Border Grid.Row="2" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0"><TextBlock Text="{Binding Status}" Foreground="{DynamicResource MutedTextBrush}" Margin="20,0" VerticalAlignment="Center" FontSize="11" /></Border>
+        <Border Grid.Row="3" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0"><TextBlock Text="{Binding Status}" Foreground="{DynamicResource MutedTextBrush}" Margin="20,0" VerticalAlignment="Center" FontSize="11" /></Border>
     </Grid>
 </Window>

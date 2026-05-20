@@ -41,6 +41,22 @@ public partial class TableElement : DocumentElement
         return table;
     }
 
+    public static TableElement CreateRaw()
+    {
+        var table = new TableElement
+        {
+            Title = "Nova Tabela",
+            Caption = "Legenda da tabela.",
+            HasHeader = true
+        };
+
+        table.AddRow(); // Adds 3 columns by default
+        table.AddRow();
+        table.AddRow();
+        table.UpdateIndices();
+        return table;
+    }
+
     public void UpdateIndices()
     {
         for (int r = 0; r < Rows.Count; r++)
