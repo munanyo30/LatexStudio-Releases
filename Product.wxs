@@ -36,10 +36,4 @@
             </Component>
         </DirectoryRef>
     </Product>
-
-    <Fragment>
-        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-            <!-- Este grupo será preenchido automaticamente pelo heat.exe do WiX -->
-        </ComponentGroup>
-    </Fragment>
 </Wix>
