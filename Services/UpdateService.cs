@@ -13,7 +13,7 @@ public record GitHubRelease(
 
 public sealed class UpdateService
 {
-    private const string RepoUrl = "https://api.github.com/repos/munanyo30/LatexStudio/releases/latest";
+    private const string RepoUrl = "https://api.github.com/repos/munanyo30/LatexStudio-Releases/releases/latest";
     private readonly HttpClient client;
 
     public UpdateService()

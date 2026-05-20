@@ -31,11 +31,12 @@ jobs:
     - name: 5. Gerar Instalador (Inno Setup)
       run: iscc LatexStudio.iss
 
-    - name: 6. Criar Release no GitHub
-      uses: softprops/action-gh-release@v2 # Atualizado para v2
+    - name: 6. Criar Release no Repositório Público
+      uses: softprops/action-gh-release@v2
       with:
+        repository: munanyo30/LatexStudio-Releases # Repositório Público
+        token: ${{ secrets.RELEASE_TOKEN }}      # Token com permissão de escrita no outro repo
         name: Latex Studio ${{ github.ref_name }}
+        tag_name: ${{ github.ref_name }}
         files: Output/LatexStudio_Setup.exe
         generate_release_notes: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
