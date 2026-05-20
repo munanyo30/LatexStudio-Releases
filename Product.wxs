@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="*" Name="Latex Studio" Language="1046" Version="1.0.0.0" Manufacturer="LatexStudio" UpgradeCode="C6D1F234-5B67-4E89-BCDE-901234567890">
-        <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+    <Product Id="*" Name="Latex Studio" Language="1046" Codepage="1252" Version="1.0.0.0" Manufacturer="LatexStudio" UpgradeCode="C6D1F234-5B67-4E89-BCDE-901234567890">
+        <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" SummaryCodepage="1252" />
 
         <MajorUpgrade DowngradeErrorMessage="Uma versão mais recente do [ProductName] já está instalada." />
         <MediaTemplate EmbedCab="yes" />
