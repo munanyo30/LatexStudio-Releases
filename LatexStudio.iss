@@ -24,8 +24,10 @@ Name: "portuguese"; MessagesFile: "compiler:Languages\Portuguese.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-; Nota: Altere 'Release' para 'Debug' se ainda não tiver feito o build de Release
-Source: "bin\Release\net8.0-windows\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+#ifndef SourceDir
+  #define SourceDir "bin\Release\net8.0-windows"
+#endif
+Source: "{#SourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "latexStudio.ico"; DestDir: "{app}"
 
 [Icons]

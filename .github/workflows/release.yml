@@ -25,18 +25,22 @@ jobs:
     - name: 3. Restaurar Dependências
       run: dotnet restore LatexStudio.sln
 
-    - name: 4. Compilar App (Release)
-      run: dotnet build LatexStudio.csproj -c Release --no-restore
+    - name: 4. Compilar e Publicar App
+      # Usamos publish para garantir que todos os ficheiros necessários vão para a pasta
+      run: dotnet publish LatexStudio.csproj -c Release -o ./publish
 
     - name: 5. Gerar Instalador (Inno Setup)
-      run: iscc LatexStudio.iss
+      # Ajustamos o Inno Setup via linha de comando para ler da pasta ./publish
+      run: iscc /DSourceDir=publish LatexStudio.iss
 
     - name: 6. Criar Release no Repositório Público
       uses: softprops/action-gh-release@v2
       with:
-        repository: munanyo30/LatexStudio-Releases # Repositório Público
-        token: ${{ secrets.RELEASE_TOKEN }}      # Token com permissão de escrita no outro repo
+        repository: munanyo30/LatexStudio-Releases
+        token: ${{ secrets.RELEASE_TOKEN }}
         name: Latex Studio ${{ github.ref_name }}
         tag_name: ${{ github.ref_name }}
+        target_commitish: master 
         files: Output/LatexStudio_Setup.exe
         generate_release_notes: true
+        make_latest: true
