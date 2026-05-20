@@ -3,11 +3,13 @@ name: Gerar Release Automática
 on:
   push:
     tags:
-      - 'v*' # Gatilho: Qualquer tag que comece por 'v' (ex: v1.0.1)
+      - 'v*'
 
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true # Resolve o aviso de depreciação do Node 20
 
     steps:
     - name: 1. Checkout do Código
@@ -22,15 +24,13 @@ jobs:
       run: dotnet restore LatexStudio.sln
 
     - name: 4. Compilar App (Release)
-      # Compilamos para a pasta bin\Release\net8.0-windows conforme o seu .iss espera
       run: dotnet build LatexStudio.csproj -c Release --no-restore
 
     - name: 5. Gerar Instalador (Inno Setup)
-      # O Inno Setup já está no PATH das máquinas do GitHub
       run: iscc LatexStudio.iss
 
     - name: 6. Criar Release no GitHub
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2 # Atualizado para v2
       with:
         name: Latex Studio ${{ github.ref_name }}
         files: Output/LatexStudio_Setup.exe
