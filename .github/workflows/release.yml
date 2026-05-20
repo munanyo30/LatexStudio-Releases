@@ -25,13 +25,12 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: 3. Compilar App (Release)
-      # Garante que o código novo do repositório é compilado em modo Release
-      run: dotnet build LatexStudio.csproj -c Release --no-restore
+      # Restauramos e compilamos tudo do zero
+      run: dotnet build LatexStudio.csproj -c Release
 
-    - name: 4. Instalar WiX e Gerar MSI
+    - name: 4. Gerar MSI via WiX
       run: |
-        dotnet tool install --global wix --version 4.0.5 || true
-        # Apontamos o WiX para a pasta oficial de output do Build de Release
+        # Usamos as ferramentas WiX que já estão no Windows do GitHub
         heat dir bin/Release/net8.0-windows -dr INSTALLFOLDER -ke -srd -cg ProductComponents -var var.SourceDir -gg -out components.wxs
         candle -dSourceDir=bin/Release/net8.0-windows Product.wxs components.wxs
         light -out LatexStudio_Setup.msi Product.wixobj components.wixobj
