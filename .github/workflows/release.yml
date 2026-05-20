@@ -9,29 +9,37 @@ jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: write # Permite criar releases e fazer upload de ficheiros
+      contents: write
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true # Resolve o aviso de depreciação do Node 20
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
     - name: 1. Checkout do Código
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Necessário para ler tags
 
     - name: 2. Configurar .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
 
-    - name: 3. Restaurar Dependências
-      run: dotnet restore LatexStudio.sln
-
-    - name: 4. Compilar e Publicar App
-      # Usamos publish para garantir que todos os ficheiros necessários vão para a pasta
+    - name: 3. Compilar e Publicar App
       run: dotnet publish LatexStudio.csproj -c Release -o ./publish
 
-    - name: 5. Gerar Instalador (Inno Setup)
-      # Ajustamos o Inno Setup via linha de comando para ler da pasta ./publish
-      run: iscc /DSourceDir=publish LatexStudio.iss
+    - name: 4. Instalar WiX e Gerar MSI
+      run: |
+        dotnet tool install --global wix --version 4.0.5 || true
+        # Usamos o WiX 3 que já vem pré-instalado por ser mais estável para este tipo de automação rápida
+        heat dir ./publish -dr INSTALLFOLDER -ke -srd -cg ProductComponents -var var.SourceDir -gg -out components.wxs
+        candle -dSourceDir=./publish Product.wxs components.wxs
+        light -out LatexStudio_Setup.msi Product.wixobj components.wixobj
+
+    - name: 5. Sincronizar Tag no Repositório Público
+      # Este passo garante que a tag v1.x.x existe lá, evitando o erro 400
+      run: |
+        git remote add public https://${{ secrets.RELEASE_TOKEN }}@github.com/munanyo30/LatexStudio-Releases.git
+        git push public ${{ github.ref_name }}
 
     - name: 6. Criar Release no Repositório Público
       uses: softprops/action-gh-release@v2
@@ -40,6 +48,6 @@ jobs:
         token: ${{ secrets.RELEASE_TOKEN }}
         name: Latex Studio ${{ github.ref_name }}
         tag_name: ${{ github.ref_name }}
-        files: Output/LatexStudio_Setup.exe
+        files: LatexStudio_Setup.msi
         generate_release_notes: true
         make_latest: true
